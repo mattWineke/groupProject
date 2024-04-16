@@ -52,6 +52,9 @@ class Platform:
         self.y = y
         self.rect = pygame.Rect(x, y, 80, 10)
         self.color='green'
+		self.type=random.randint(1,3) #will be able to this for a method that controls that type of platform it is
+		self.visible=True  #Will be useful if the platform is one that breaks
+		self.collision=True #same as the line above
 
     
 
@@ -97,7 +100,7 @@ def main():
 
         surface.fill((0, 0, 0))  # Clear the screen
         
-        #pygame.draw.rect(surface,platform.x,platform.y,80,10)
+        #pygame.draw.rect(surface,platform.x,platform.y,80,10)    #need to figure out argument format before this spawns correctly
         pygame.draw.circle(surface, "red", (player.x, player.y), player.radius)
 
         pygame.display.flip()  # Update the display
