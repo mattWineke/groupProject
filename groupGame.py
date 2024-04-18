@@ -1,6 +1,6 @@
-#this program will made by my group who's names i cannot spell yet, because it's a lot of work
-#the program will use pygame to create a platformer, incorperating loops, animation, iteration
-#math, functions, libraries, and more
+# This program will made by my group whose names i cannot spell yet, because it's a lot of work
+# The program will use pygame to create a platformer, incorperating loops, animation, iteration,
+# math, functions, libraries, and more
 
 import pygame
 import random
@@ -52,10 +52,10 @@ class Platform:
         self.y = y
         self.rect = pygame.Rect(x, y, 80, 10)
         self.color='green'
-		self.type=random.randint(1,3) #will be able to this for a method that controls that type of platform it is
-		self.visible=True  #Will be useful if the platform is one that breaks
-		self.collision=True #same as the line above
-
+        self.type=random.randint(1,3) #will be able to this for a method that controls that type of platform it is
+        self.visible=True  #Will be useful if the platform is one that breaks
+        self.collision=True #same as the line above
+    
     
 
 platform = Platform(100, 50)
