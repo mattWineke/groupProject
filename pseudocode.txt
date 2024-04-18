@@ -1,0 +1,59 @@
+Game: Pluto’s Pursuit
+
+•	Classes:
+    o	Player:
+        	Attributes: name, score, currentPowerUp, isAlive
+        	Methods: move(), jump(), applyPowerUp(), checkIfAlive(), applyGravity()
+    o	Game:
+        	Attributes: player, platforms, obstacles, powerUps, gameState
+        	Methods: startGame(), spawnPlatform(), spawnObstacle(), spawnPowerUp(), checkCollision(), gameOver(), displayScore()
+    o	Platform:
+        	Attributes: position, size, type (normal, moving, disappearing)
+        	Methods: move(), disappear()
+    o	Obstacle:
+        	Attributes: position, size
+        	Methods: applyEffect(), move()
+    o	PowerUp:
+        	Attributes: position, size, type (slowMotion, superJump, invincibility)
+        	Methods: applyEffect(), disappear()
+        
+•	Game Flow:
+    o	Initialize Game with a single Player marked as alive.
+    o	WHILE Player is alive:
+        	Apply gravity to the Player constantly, causing them to fall.
+        	Spawn Platforms periodically.
+        	Randomly spawn Obstacles and PowerUps on platforms.
+        	Check for collision between Player and Platforms/Obstacles/PowerUps.
+        	IF collision with Platform:
+        
+•	Player can jump to counter gravity.
+        	IF collision with Obstacle:
+        
+•	Apply obstacle effect.
+        	IF collision with PowerUp:
+        
+•	Apply power-up effect to Player.
+        	Move Platforms and Obstacles down the screen.
+        	Increase score based on survival time.
+        	IF Player falls off screen OR collides with a deadly obstacle:
+        
+•	Mark Player as not alive (isAlive = false) and trigger gameOver().
+    o	End Game when Player is no longer alive.
+    o	Display final score.
+    
+•	Input Design:
+    o	Request Player Name at game start.
+    o	The player controls movement through keyboard input (arrow keys or A/D/W keys).
+    
+•	Output Design:
+    o	Show Instructions briefly at the start.
+    o	Continuously update the game screen with new Platforms, Obstacles, and PowerUps.
+    o	Display Player's current score and active power-up on screen.
+    o	End of Game:
+        	Display final score and a message (e.g., "Game Over! Try again?").
+        
+•	Data Management:
+    o	Read from file:
+        	Load previous high scores with associated name and/or achievements.
+    o	Write to file:
+        	Save new high scores and/or achievements.
