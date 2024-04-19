@@ -8,6 +8,7 @@ import sys
 import os
 
 
+
 class Player:
     def __init__(self, x, y):
 
@@ -47,7 +48,7 @@ class Player:
             if self.jump_count > 0:
                 self.y -= 5  # Adjust to control the jump height
                 self.jump_count -= 1
-            elif self.y < 775:  # Check if circle is above the bottom of the screen
+            elif self.y < 775:  # Check if player is above the bottom of the screen
                 self.y += 10  # Adjust to control the fall speed
             else:
                 self.is_jumping = False
@@ -87,17 +88,20 @@ def movePlayer(player):
     clock = pygame.time.Clock()
 
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
+   
+    if keys[pygame.K_LEFT]: 
         player.current_direction = "left"
-        player.current_sprites = player.sprites_left
+        player.current_sprites = player.sprites_left # make the current sprite list left
         current_frame += 0.2
         player.move(-player.speed, 0)
 
     if keys[pygame.K_RIGHT]:
         player.current_direction = "right"
-        player.current_sprites = player.sprites_right
+        player.current_sprites = player.sprites_right # make the current sprite list right
         current_frame += 0.2
         player.move(player.speed, 0)
+
+
     if keys[pygame.K_UP]:
         player.y-=10  # Maybe freeze here
     if keys[pygame.K_DOWN]:
@@ -113,10 +117,17 @@ def movePlayer(player):
         if keys[pygame.K_RIGHT]:  # Allow right movement during jump
             player.move(player.speed, 0)
 
+def animationLooping():
+    
+    player.current_frame += 0.2
+    if player.current_frame >= len(player.current_sprites): 
+        player.current_frame = 0
+    if player.current_frame == 4:
+        player.current_frame = 0
+
 
 
 def main():
-    current_frame = 0 # for sprite animation
 
     running = True
     while running:
@@ -130,10 +141,7 @@ def main():
 
         surface.fill((0, 0, 0))  # Clear the screen
         
-        if current_frame >= len(player.current_sprites): # something wrong with this being here, fix in the morning gn.
-            current_frame = 0
-        if current_frame == 4:
-            current_frame = 0
+        animationLooping() 
 
         #pygame.draw.rect(surface,platform.x,platform.y,80,10)    #need to figure out argument format before this spawns correctly
         #pygame.draw.circle(surface, "red", (player.x, player.y), player.sprite_rect)
@@ -141,7 +149,7 @@ def main():
 
         pygame.display.flip()  # Update the display
 
-        clock.tick(60)  # Limit the frame rate to 60 FPS
+        clock.tick(30)  # Limit the frame rate to 30 FPS # I changed it from 60
 
     pygame.quit()  # Quit pygame properly
     sys.exit()  
