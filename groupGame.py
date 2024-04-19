@@ -88,7 +88,10 @@ def movePlayer(player):
     clock = pygame.time.Clock()
 
     keys = pygame.key.get_pressed()
-   
+
+    player.current_direction = "idle"
+    player.current_sprites = player.sprites_idle #fall back to idle sprite list unless keys are being pressed
+    
     if keys[pygame.K_LEFT]: 
         player.current_direction = "left"
         player.current_sprites = player.sprites_left # make the current sprite list left
