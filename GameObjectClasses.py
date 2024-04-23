@@ -116,8 +116,6 @@ class Platform:
         self.rect = pygame.Rect(x, y, 60, 15)
         self.color='green'
 
-        
-
 
     def whatTheFrock():
         mode=random.randint(1,3)  #Type one should be plain, two should back and forth 
