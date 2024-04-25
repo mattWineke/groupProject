@@ -1,21 +1,17 @@
-#this file is taking the classes out of the main program to make it less of an eyesore
-
 import pygame
-import random
-import sys
-import os
-
 
 class Player:
     def __init__(self, x, y):  #default constructor
 
         # The sprite animation frames
-        self.sprites_right = [pygame.image.load("R1Pluto.png"), pygame.image.load("R2Pluto.png"),
-                 pygame.image.load("R3Pluto.png"), pygame.image.load("R4Pluto.png") ]
-        self.sprites_left = [pygame.image.load("L1Pluto.png"), pygame.image.load("L2Pluto.png"),
-                pygame.image.load("L3Pluto.png"), pygame.image.load("L4Pluto.png")]
-        self.sprites_idle = [pygame.image.load("I1Pluto.png"), pygame.image.load("I2Pluto.png"),
-                        pygame.image.load("I3Pluto.png"), pygame.image.load("I4Pluto.png")]
+        characterPath = "images/character"
+        self.sprites_right = [pygame.image.load(f"{characterPath}/R1Pluto.png"), pygame.image.load(f"{characterPath}/R2Pluto.png"),
+                 pygame.image.load(f"{characterPath}/R3Pluto.png"), pygame.image.load(f"{characterPath}/R4Pluto.png") ]
+        self.sprites_left = [pygame.image.load(f"{characterPath}/L1Pluto.png"), pygame.image.load(f"{characterPath}/L2Pluto.png"),
+                pygame.image.load(f"{characterPath}/L3Pluto.png"), pygame.image.load(f"{characterPath}/L4Pluto.png")]
+        self.sprites_idle = [pygame.image.load(f"{characterPath}/I1Pluto.png"), pygame.image.load(f"{characterPath}/I2Pluto.png"),
+                        pygame.image.load(f"{characterPath}/I3Pluto.png"), pygame.image.load(f"{characterPath}/I4Pluto.png")]
+
         # PLayer current direction, for the sprite animations
         self.current_direction = "idle"
         self.current_sprites = self.sprites_idle # current sprite list
@@ -49,7 +45,7 @@ class Player:
                 self.y -= 5  # Adjust to control the jump height
                 self.jump_count -= 1
             elif self.y < 700:  # Check if player is above the bottom of the screen
-                self.y += 10  # Adjust to control the fall speed
+                self.y += 15  # Adjust to control the fall speed
             else:
                 self.is_jumping = False
                 self.jump_count = self.jump_height
@@ -107,27 +103,3 @@ class Player:
             player.current_frame = 0
         if player.current_frame == 4:
             player.current_frame = 0
-
-                
-class Platform:
-    def __init__(self, x, y):           
-        self.x = x
-        self.y = y
-        self.rect = pygame.Rect(x, y, 60, 15)
-        self.color='green'
-
-
-    def whatTheFrock():
-        mode=random.randint(1,3)  #Type one should be plain, two should back and forth 
-                                  # three should break after a second or two  <--- do this last bc i need make collision first
-        if mode==1:
-            pass
-        elif mode==2:
-            pass
-        else:
-            pass
-
-        
-    def update_height(self): #this will manipulate objects within the Platform class in accordance to the player, this will require Groups which I can do unless ur bored
-        pass
-    
