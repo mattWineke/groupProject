@@ -1,9 +1,33 @@
 import pygame
 
-class Player:
-    def __init__(self, x, y):  #default constructor
+# Named variables
+SCREEN_BOTTOM = 700
+SCREEN_LEFT = 0
+SCREEN_RIGHT = 415
+SCREEN_X_MIDDLE = 50
 
-        # The sprite animation frames
+GRAVITY_ACCELERATION = 1.25
+JUMPING_STRENGTH = 50
+
+class Player:
+    # Constructor for Player class
+    def __init__(self):
+        # Hitbox radius
+        self.radius = 10
+
+        # Player's coordinates and moving speed
+        self.x = SCREEN_X_MIDDLE
+        self.y = 0
+        self.speed = 10
+
+        # Gravity controls
+        self.is_on_surface = True
+        self.is_jumping = False
+        self.current_falling_speed = 1
+        self.current_jumping_strength = JUMPING_STRENGTH
+
+
+        # Sprite animation frames
         characterPath = "images/character"
         self.sprites_right = [pygame.image.load(f"{characterPath}/R1Pluto.png"), pygame.image.load(f"{characterPath}/R2Pluto.png"),
                  pygame.image.load(f"{characterPath}/R3Pluto.png"), pygame.image.load(f"{characterPath}/R4Pluto.png") ]
@@ -12,94 +36,94 @@ class Player:
         self.sprites_idle = [pygame.image.load(f"{characterPath}/I1Pluto.png"), pygame.image.load(f"{characterPath}/I2Pluto.png"),
                         pygame.image.load(f"{characterPath}/I3Pluto.png"), pygame.image.load(f"{characterPath}/I4Pluto.png")]
 
-        # PLayer current direction, for the sprite animations
+        # Variables to store player's current direction, for the sprite animations
         self.current_direction = "idle"
         self.current_sprites = self.sprites_idle # current sprite list
         self.current_frame = 0 # current index of the sprite frames
         
-        self.sprite_rect = self.sprites_right[0].get_rect(center=[0,800])# Get sprite rectangle
-        self.radius=10
-        self.x = x
-        self.y = y
-        self.speed = 10
-        self.is_jumping = False
-        self.jump_height = 50
-        self.jump_count = 10
-
+        self.sprite_rect = self.sprites_right[0].get_rect(center=[0,800]) # Get sprite rectangle
 
     def __str__(self): #toString method for hitbox testing later
-        return "My name is Pluto! I'm currently at the coordinates " +str(self.x)+", "+ str(self.y)+ ". My speed is "+str(self.speed)+" and my position is " +self.current_direction
+        return "My name is Pluto! I'm currently at the coordinates " + str(self.x)+", "+ str(self.y)+ ". My speed is "+str(self.speed)+" and my position is " +self.current_direction
         
-    def move(self, dx, dy):
-        self.x += dx
-        self.y += dy
+    def move(self, pixels_to_move):
+        self.x += pixels_to_move
 
-    def jump(self):
-        if not self.is_jumping:
+        # Amount of pixels the player has to move off-screen to teletransport to the other side
+        LOOPING_OFFSET = 20
+
+        # Moves the player to the other side of the screen if it moves too far
+        if self.x <= SCREEN_LEFT - LOOPING_OFFSET * 2:
+            self.x = SCREEN_RIGHT
+        elif self.x >= SCREEN_RIGHT + LOOPING_OFFSET:
+            self.x = SCREEN_LEFT
+
+
+    def jump(self, is_gravity_call = False):
+        if self.is_on_surface or is_gravity_call: # Only execute if the player is on a "floor" or the function is being called by the applyGravity function
+            self.is_on_surface = False
             self.is_jumping = True
-            self.jump_count = self.jump_height
+            
+            # Update player's y coordinate
+            self.y -= self.current_jumping_strength
 
-    def update_jump(self):
-        if self.is_jumping:
-            if self.jump_count > 0:
-                self.y -= 5  # Adjust to control the jump height
-                self.jump_count -= 1
-            elif self.y < 700:  # Check if player is above the bottom of the screen
-                self.y += 15  # Adjust to control the fall speed
-            else:
+            # Make jumping strength weaker
+            self.current_jumping_strength *= .8
+
+            # If the jumping strength is too weak, stop going up
+            if self.current_jumping_strength < 1:
                 self.is_jumping = False
-                self.jump_count = self.jump_height
 
-    def loop(player):          #moves the object to the other side of the screen if they move too far
-        if player.x <= -40:
-            player.x = 418
-        if player.x >= 420:
-            player.x = -39
+                # Reset jumping strength for next jump
+                self.current_jumping_strength = JUMPING_STRENGTH
 
-    def movePlayer(player):
-        frame_rate = 10 #animation speed
-        current_frame = 0
-        clock = pygame.time.Clock()
+    # Surfaces has to be an array with the coordinates of the platforms and screen bottom
+    # Method that's called frame
+    def tick(self, surfaces = []):
+        self.animatePlayerImage()
 
-        keys = pygame.key.get_pressed()
+        if self.is_jumping:
+            self.jump(is_gravity_call=True)
+        else:
+            self.fall(surfaces)
+            
 
-        player.current_direction = "idle"
-        player.current_sprites = player.sprites_idle #fall back to idle sprite list unless keys are being pressed
+    def isOnPlatform(self, platforms):
+        player_is_on_platform = False
+        surfaceYPosition = 0
+        for surface in platforms:
+            if self.x >= surface.x and self.x <= surface.x + surface.width and self.y == surface.y:
+                player_is_on_platform = True
+                surfaceYPosition = surface.y
+                break
+
+        return player_is_on_platform, surfaceYPosition
+
+    def fall(self, surfaces):
+        # Check is the player is on a surface
+        isOnPlatform, platformYPosition = self.isOnPlatform(surfaces)
         
-        if keys[pygame.K_LEFT]: 
-            player.current_direction = "left"
-            player.current_sprites = player.sprites_left # make the current sprite list left
-            current_frame += 0.2
-            player.move(-player.speed, 0)
+        if self.y < SCREEN_BOTTOM and not isOnPlatform:
+            self.is_falling = True
 
-        if keys[pygame.K_RIGHT]:
-            player.current_direction = "right"
-            player.current_sprites = player.sprites_right # make the current sprite list right
-            current_frame += 0.2
-            player.move(player.speed, 0)
+            self.current_falling_speed *= GRAVITY_ACCELERATION
+            self.y += self.current_falling_speed
 
+        else: 
+            self.is_on_surface = True
+            self.is_falling = False
 
-        if keys[pygame.K_UP]:
-            player.y-=10  # Maybe freeze here
-        if keys[pygame.K_DOWN]:
-            player.move(0, player.speed)
-        if keys[pygame.K_SPACE]:
-            player.jump()
-            print(player.x,"",player.y)
-        if keys[pygame.K_p]:
-            print (player)
+            if isOnPlatform:
+                self.y = platformYPosition
+            else:
+                self.y = SCREEN_BOTTOM
 
-        # Allow movement during jump
-        if player.is_jumping:  # Check if the player is currently jumping
-            if keys[pygame.K_LEFT]:  # Allow left movement during jump
-                player.move(-player.speed, 0)
-            if keys[pygame.K_RIGHT]:  # Allow right movement during jump
-                player.move(player.speed, 0)
+            # Reset falling speed
+            self.current_falling_speed = 1
+            
+    # Function to update player's animation
+    def animatePlayerImage(self):
+        self.current_frame += 0.2
 
-    def animationLooping(player):
-        
-        player.current_frame += 0.2
-        if player.current_frame >= len(player.current_sprites): 
-            player.current_frame = 0
-        if player.current_frame == 4:
-            player.current_frame = 0
+        if self.current_frame >= len(self.current_sprites): 
+            self.current_frame = 0

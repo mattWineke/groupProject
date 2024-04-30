@@ -33,26 +33,26 @@ class Platform:
                 # Handle breaking animation or logic here
 
 # Example usage:
-pygame.init()
-screen = pygame.display.set_mode((800, 600))
-clock = pygame.time.Clock()
+# pygame.init()
+# screen = pygame.display.set_mode((800, 600))
+# clock = pygame.time.Clock()
 
-platform = Platform(400, 300)
+# platform = Platform(400, 300)
 time_since_platform_creation = 0
 
-running = True
-while running:
-    screen.fill((255, 255, 255))
+# running = True
+# while running:
+#     screen.fill((255, 255, 255))
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+#     for event in pygame.event.get():
+#         if event.type == pygame.QUIT:
+#             running = False
 
-    time_since_platform_creation += clock.tick(60)
+#     time_since_platform_creation += clock.tick(60)
 
-    platform.update_height()
+#     platform.update_height()
 
-    pygame.draw.rect(screen, pygame.Color(platform.color), platform.rect)
-    pygame.display.flip()
+#     pygame.draw.rect(screen, pygame.Color(platform.color), platform.rect)
+#     pygame.display.flip()
 
-pygame.quit()
+# pygame.quit()

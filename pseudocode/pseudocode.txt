@@ -24,20 +24,20 @@ Game: Pluto’s Pursuit
         	Spawn Platforms periodically.
         	Randomly spawn Obstacles and PowerUps on platforms.
         	Check for collision between Player and Platforms/Obstacles/PowerUps.
+        
         	IF collision with Platform:
-        
-•	Player can jump to counter gravity.
+            •	Player can jump to counter gravity.
+            
         	IF collision with Obstacle:
-        
-•	Apply obstacle effect.
+            •	Apply obstacle effect.
+            
         	IF collision with PowerUp:
-        
-•	Apply power-up effect to Player.
+            •	Apply power-up effect to Player.
         	Move Platforms and Obstacles down the screen.
         	Increase score based on survival time.
-        	IF Player falls off screen OR collides with a deadly obstacle:
         
-•	Mark Player as not alive (isAlive = false) and trigger gameOver().
+        	IF Player falls off screen OR collides with a deadly obstacle:
+            •	Mark Player as not alive (isAlive = false) and trigger gameOver().
     o	End Game when Player is no longer alive.
     o	Display final score.
     
