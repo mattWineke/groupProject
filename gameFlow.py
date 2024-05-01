@@ -1,22 +1,49 @@
 import pygame
 import sys
+import random
 
 from classes.Player import Player
 from classes.Platform import Platform
 from classes.Obstacle import Obstacle
 from classes.PowerUp import PowerUp
         
-pygame.init()          
-surface = pygame.display.set_mode((400, 800))
+# Named variables
+WINDOW_WIDTH = 400
+WINDOW_HEIGHT = 800
+FRAME_RATE = 45
+
+BLACK = (0, 0, 0)
+        
+# Initialize Pygame
+pygame.init()    
+surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Pluto's Pursuit")
 clock = pygame.time.Clock()
 
-# Object instances
-player = Player()
-platform = Platform(100, 50)
+# Player Object instance
+pluto = Player()
+
+# Set window icon to one of pluto's images
+pygame.display.set_icon(pluto.sprites_right[0])
 
 # Will be updated in the main loop, and attached to a label on the top left
-score = None
+score = 0
+
+# List with platform objects
+PLATFORMS = []
+
+def createPlatforms():
+    PLATFORM_GAP = 180
+    PADDING = 20
+    PLATFORM_WIDTH = 120
+
+    last_platform_y_position = PLATFORMS[-1].y if PLATFORMS else WINDOW_HEIGHT - PADDING
+    
+    if not PLATFORMS or last_platform_y_position > 100:
+        new_platform_y_position = last_platform_y_position - PLATFORM_GAP 
+        new_platform_x_position = random.randint(PADDING, WINDOW_WIDTH - PLATFORM_WIDTH - PADDING)
+        PLATFORMS.append(Platform(new_platform_x_position, new_platform_y_position, PLATFORM_WIDTH))
+
 
 def main():
     running = True
@@ -26,47 +53,66 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
-        # Update Player instance
-        player.tick()
+        # Use createPlatforms function's algorithm to create a group of platforms
+        createPlatforms()
+
+        # Update Player instance every frame
+        pluto.tick(surfaces = PLATFORMS)
 
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_LEFT]: 
-            player.current_direction = "left"
-            player.current_sprites = player.sprites_left # make the current sprite list left
+            pluto.move(-pluto.speed)
             
-            player.move(-player.speed)
+            pluto.current_direction = "left"
+            pluto.current_sprites = pluto.sprites_left # Make the current sprite list left
 
         elif keys[pygame.K_RIGHT]:
-            player.current_direction = "right"
-            player.current_sprites = player.sprites_right # make the current sprite list right
+            pluto.move(pluto.speed)
 
-            player.move(player.speed)
+            pluto.current_direction = "right"
+            pluto.current_sprites = pluto.sprites_right # Make the current sprite list right
 
         else:
-            player.current_direction = "idle"
-            player.current_sprites = player.sprites_idle #fall back to idle sprite list unless keys are being pressed
+            pluto.current_direction = "idle"
+            pluto.current_sprites = pluto.sprites_idle # Fall back to idle sprite list unless keys are being pressed
 
         if keys[pygame.K_SPACE] or keys[pygame.K_UP]:
-            player.jump()
+            pluto.jump()
 
-        # Print player object info when pressing p
+        # Print pluto's info when pressing p
         if keys[pygame.K_p]:
-            print(player)
+            print(pluto)
 
-        surface.fill((0, 0, 0))
+
+        # Draw background
+        surface.fill(BLACK)
         
-        pygame.draw.circle(surface, "red", (player.x, player.y), player.radius)
-        pygame.draw.rect(surface,'green',platform.rect)
-        surface.blit(player.current_sprites[int(player.current_frame)], (player.x, player.y))
+        # Draw pluto's satellite
+        SATELLITE_RADIUS = 10
+        pygame.draw.circle(surface, "red", (pluto.x, pluto.y), SATELLITE_RADIUS)
 
-        pygame.display.flip()  # Update the display
+        # Draw pluto
+        surface.blit(pluto.current_sprites[int(pluto.current_frame)], pluto.sprite_rect)
+        pluto.sprite_rect.update(pluto.x, pluto.y, pluto.width, pluto.height)
 
-        clock.tick(45)  # Set the frame rate to 45 FPS
+        # Draw platforms
+        for platform in PLATFORMS:
+            pygame.draw.rect(surface, platform.color, pygame.Rect(platform.x, platform.y, platform.width, platform.height))
 
-    pygame.quit()  # Quit pygame properly
+            # Update Platform instance every frame
+            platform.tick()
+
+
+        # Update the display
+        pygame.display.flip()
+
+        # Set frame rate
+        clock.tick(FRAME_RATE)
+
+    # Exit game
+    pygame.quit()
     sys.exit()  
-
 
 if __name__ == "__main__":
     main()

@@ -1,58 +1,47 @@
-import pygame
 import random
 
 class Platform:
-    def __init__(self, x, y):           
+    def __init__(self, x, y, width = 80, height = 15, color = "white"):           
         self.x = x
         self.y = y
-        self.rect = pygame.Rect(x, y, 60, 15)
-        self.color='green'
+        self.width = width
+        self.height = height
+        self.color = color
 
-    def whatTheFrock(self):
-        mode = random.randint(1, 3)  # Type one should be plain, two should back and forth 
-                                      # three should break after a second or two  <--- do this last bc i need make collision first
-        if mode == 1:
-            pass  # Plain platform
-        elif mode == 2:
-            self.y_speed = random.choice([-1, 1]) * 2  # Move up or down
+        self.type = self.determinePlatformType()
+        self.broken = False
+
+    # Method that gets called every frame
+    def tick(self):
+        if self.type == "moving":
+            self.movePlatform()
+
+        elif self.type == "breakable":
+            self.checkIfPlatformShouldBreak()
+
+    def determinePlatformType(self):
+        random_number = random.randint(1, 100)
+
+        # Create a normal platform - 60% chance
+        if random_number < 60:
+            return "normal"
+
+        # Create a moving platform - 20% chance
+        elif random_number < 20:
+            return "moving"
+
+        # Create a breakable platform - 20% chance
         else:
-            self.breakable = True
+            return "breakable"
 
-    def update_height(self):
-        pass  # Placeholder. Will manipulate objects within the Platform class in accordance with the player.
+    # Method that gets called every frame if it's a moving platform
+    def movePlatform(self):
+        pass # Should make the platform move either up AND down, or left and right in a loop
 
-        # Example: Move the platform down if it's moving
-        if hasattr(self, 'y_speed'):
-            self.y += self.y_speed
+    # Method that gets called every frame if it's a breakable platform
+    def checkIfPlatformShouldBreak(self):
+        # self.broken is set to True when player jumps on it
+        if self.broken:
+            pass # Code to break platform
 
-        # Example: Handle platform breaking
-        if hasattr(self, 'breakable'):
-            if self.breakable and time_since_platform_creation > 2000:  # Assuming time_since_platform_creation is in milliseconds
-                # Platform breaks after 2 seconds
-                self.color = 'red'  # Change color to indicate breaking
-                # Handle breaking animation or logic here
-
-# Example usage:
-# pygame.init()
-# screen = pygame.display.set_mode((800, 600))
-# clock = pygame.time.Clock()
-
-# platform = Platform(400, 300)
-time_since_platform_creation = 0
-
-# running = True
-# while running:
-#     screen.fill((255, 255, 255))
-
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT:
-#             running = False
-
-#     time_since_platform_creation += clock.tick(60)
-
-#     platform.update_height()
-
-#     pygame.draw.rect(screen, pygame.Color(platform.color), platform.rect)
-#     pygame.display.flip()
-
-# pygame.quit()
+    # Since the collision functionality is already implemented, we don't need a function that returns the platform's information anymore.
