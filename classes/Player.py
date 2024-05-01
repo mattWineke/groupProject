@@ -4,18 +4,25 @@ import pygame
 SCREEN_BOTTOM = 700
 SCREEN_LEFT = -15
 SCREEN_RIGHT = 400
-SCREEN_X_MIDDLE = 170
+
+STARTING_X_POSITION = 50
 
 GRAVITY_ACCELERATION = 1.25
 MAXIMUM_FALLING_SPEED = 40
 JUMPING_STRENGTH = 50
 
+CAMERA_FOLLOW_OFFSET = SCREEN_BOTTOM - 150  # Position where the camera will place pluto when moving
+
 class Player:
     # Constructor for Player class
     def __init__(self):
         # Player's coordinates
-        self.x = SCREEN_X_MIDDLE
-        self.y = -500
+        self.x = STARTING_X_POSITION
+        self.y = SCREEN_BOTTOM
+
+        # Camera control - updates when getting on platform
+        self.camera_y_offset = 0
+        self.target_camera_y_offset = 0
         
         # Player's moving speed
         self.speed = 10
@@ -27,14 +34,16 @@ class Player:
         self.current_jumping_strength = JUMPING_STRENGTH
 
         
-        # List with Sprite animation frames
+        # Lists with Sprite animation frames
+        load = pygame.image.load
         characterPath = "images/character"
-        self.sprites_right = [pygame.image.load(f"{characterPath}/R1Pluto.png"), pygame.image.load(f"{characterPath}/R2Pluto.png"),
-                 pygame.image.load(f"{characterPath}/R3Pluto.png"), pygame.image.load(f"{characterPath}/R4Pluto.png") ]
-        self.sprites_left = [pygame.image.load(f"{characterPath}/L1Pluto.png"), pygame.image.load(f"{characterPath}/L2Pluto.png"),
-                pygame.image.load(f"{characterPath}/L3Pluto.png"), pygame.image.load(f"{characterPath}/L4Pluto.png")]
-        self.sprites_idle = [pygame.image.load(f"{characterPath}/I1Pluto.png"), pygame.image.load(f"{characterPath}/I2Pluto.png"),
-                        pygame.image.load(f"{characterPath}/I3Pluto.png"), pygame.image.load(f"{characterPath}/I4Pluto.png")]
+
+        self.sprites_right = [load(f"{characterPath}/R1Pluto.png"), load(f"{characterPath}/R2Pluto.png"),
+                 load(f"{characterPath}/R3Pluto.png"), load(f"{characterPath}/R4Pluto.png") ]
+        self.sprites_left = [load(f"{characterPath}/L1Pluto.png"), load(f"{characterPath}/L2Pluto.png"),
+                load(f"{characterPath}/L3Pluto.png"), load(f"{characterPath}/L4Pluto.png")]
+        self.sprites_idle = [load(f"{characterPath}/I1Pluto.png"), load(f"{characterPath}/I2Pluto.png"),
+                        load(f"{characterPath}/I3Pluto.png"), load(f"{characterPath}/I4Pluto.png")]
 
         # Variables to store player's current direction, for the sprite animations
         self.current_direction = "idle"
@@ -49,11 +58,12 @@ class Player:
         
 
     def __str__(self): #toString method for testing
-        return "Coordinates: " + str(self.x) + ", " + str(self.y) + ". Speed: "+ str(self.speed)+". Direction: " + self.current_direction
+        return "Coordinates: " + str(self.x) + ", " + str(self.y) + ". Speed: "+ str(self.speed)+". Direction: " + self.current_direction + "."
 
     # Method that's called every frame
     def tick(self, surfaces = []):
         self.animatePlayerImage()
+        self.animateCameraMovement()
 
         if self.is_jumping:
             self.jump(is_tick_call=True)
@@ -75,15 +85,15 @@ class Player:
 
 
     def jump(self, is_tick_call = False):
-        if self.is_on_surface or is_tick_call: # Only execute if the player is on a "floor" or the function is being called by the tick function
+        if self.is_on_surface or is_tick_call: # Only execute if the player is on a surface or the function is being called by the tick function
             self.is_on_surface = False
             self.is_jumping = True
             
-            # Update player's y coordinate
+            # Update player's y-coordinate
             self.y -= self.current_jumping_strength
 
             # Make jumping strength weaker
-            self.current_jumping_strength *= .8
+            self.current_jumping_strength /= GRAVITY_ACCELERATION
 
             # If the jumping strength is too weak, stop going up
             if self.current_jumping_strength < 1:
@@ -113,29 +123,39 @@ class Player:
                 # Break the platform if it has breakable type
                 if platform.type == "breakable":
                     platform.broken = True
+
+                # Adjust camera
+                self.target_camera_y_offset = CAMERA_FOLLOW_OFFSET - self.y
                     
                 break
 
         return player_is_on_platform, platformYPosition - self.width
 
     def fall(self, surfaces):
-        # Check is the player is on a surface
+        # Check is the player is on a platform
         isOnPlatform, platformYPosition = self.isOnPlatform(surfaces)
         
         if self.y < SCREEN_BOTTOM and not isOnPlatform:
+            self.is_on_surface = False
             self.is_falling = True
 
             self.current_falling_speed *= GRAVITY_ACCELERATION
-            self.y += min([self.current_falling_speed, MAXIMUM_FALLING_SPEED])
+            self.y += min(self.current_falling_speed, MAXIMUM_FALLING_SPEED)
 
         else: 
             self.is_on_surface = True
             self.is_falling = False
 
+            # Player fell on a platform
             if isOnPlatform:
                 self.y = platformYPosition
+
+            # Player fell on the bottom of the screen
             else:
                 self.y = SCREEN_BOTTOM
+
+                # Adjust camera
+                self.target_camera_y_offset = 0
 
             # Reset falling speed
             self.current_falling_speed = 1
@@ -146,3 +166,18 @@ class Player:
 
         if self.current_frame >= len(self.current_sprites): 
             self.current_frame = 0
+
+    # Function to animate camera's movement smoothly
+    def animateCameraMovement(self):
+        movingDistance = self.target_camera_y_offset - self.camera_y_offset
+
+        # Player reached a new platform
+        if movingDistance > 0:
+            self.camera_y_offset += max(movingDistance / 5, 5)
+            
+        # Player fell back to initial position
+        elif movingDistance < 0 and self.target_camera_y_offset == 0:
+            self.camera_y_offset -= max(movingDistance / 5, 5)
+
+            # Ensure the camera does not go below 0
+            self.camera_y_offset = max(self.camera_y_offset, 0)
