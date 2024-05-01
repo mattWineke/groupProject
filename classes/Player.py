@@ -7,15 +7,17 @@ SCREEN_RIGHT = 400
 
 STARTING_X_POSITION = 50
 
-GRAVITY_ACCELERATION = 1.25
+INITIAL_GRAVITY_ACCELERATION = 1.25
 MAXIMUM_FALLING_SPEED = 40
 JUMPING_STRENGTH = 50
 
-CAMERA_FOLLOW_OFFSET = SCREEN_BOTTOM - 150  # Position where the camera will place pluto when moving
+CAMERA_FOLLOW_OFFSET = SCREEN_BOTTOM - 300  # Position where the camera will place pluto when moving
 
 class Player:
     # Constructor for Player class
     def __init__(self):
+        self.is_alive = True
+        
         # Player's coordinates
         self.x = STARTING_X_POSITION
         self.y = SCREEN_BOTTOM
@@ -28,6 +30,7 @@ class Player:
         self.speed = 10
 
         # Gravity controls
+        self.gravity_acceleration = INITIAL_GRAVITY_ACCELERATION
         self.is_on_surface = True
         self.is_jumping = False
         self.current_falling_speed = 1
@@ -55,6 +58,8 @@ class Player:
         # Player's dimensions
         self.width = self.sprite_rect.width
         self.height = self.sprite_rect.height
+
+        self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
         
 
     def __str__(self): #toString method for testing
@@ -62,18 +67,19 @@ class Player:
 
     # Method that's called every frame
     def tick(self, surfaces = []):
+        self.updateHitbox()
         self.animatePlayerImage()
         self.animateCameraMovement()
 
         if self.is_jumping:
-            self.jump(is_tick_call=True)
+            self.jump(override_surface_condition=True)
         else:
             self.fall(surfaces)
         
     def move(self, pixels_to_move):
         self.x += pixels_to_move
 
-        # Amount of pixels the player has to move off-screen to teletransport to the other side
+        # Amount of pixels the player has to move off-screen to appear on the other side
         LOOPING_OFFSET = 5
 
         # Moves the player to the other side of the screen if it moves too far
@@ -84,8 +90,8 @@ class Player:
             self.x = SCREEN_LEFT
 
 
-    def jump(self, is_tick_call = False):
-        if self.is_on_surface or is_tick_call: # Only execute if the player is on a surface or the function is being called by the tick function
+    def jump(self, override_surface_condition = False):
+        if self.is_on_surface or override_surface_condition:
             self.is_on_surface = False
             self.is_jumping = True
             
@@ -93,7 +99,7 @@ class Player:
             self.y -= self.current_jumping_strength
 
             # Make jumping strength weaker
-            self.current_jumping_strength /= GRAVITY_ACCELERATION
+            self.current_jumping_strength /= self.gravity_acceleration
 
             # If the jumping strength is too weak, stop going up
             if self.current_jumping_strength < 1:
@@ -109,14 +115,11 @@ class Player:
         # Variable to store y position of the platform where the player is standing
         platformYPosition = 0
         
-        # Create a rectangle with pluto's dimensions to check if it collides with a platform
-        player_rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        
         for platform in platforms:
-            # Create a rectangle for each platform considering pluto's width
-            platform_rect = pygame.Rect(platform.x + self.width / 2.5, platform.y, platform.width - self.width / 2, platform.height)
+            # Create a hitbox for each platform considering pluto's width
+            platform_hitbox = pygame.Rect(platform.x + self.width / 2.5, platform.y, platform.width - self.width / 2, platform.height)
 
-            if player_rect.colliderect(platform_rect):
+            if self.hitbox.colliderect(platform_hitbox):
                 player_is_on_platform = True
                 platformYPosition = platform.y - platform.height
 
@@ -135,11 +138,11 @@ class Player:
         # Check is the player is on a platform
         isOnPlatform, platformYPosition = self.isOnPlatform(surfaces)
         
-        if self.y < SCREEN_BOTTOM and not isOnPlatform:
+        if self.y < SCREEN_BOTTOM and not isOnPlatform or not self.is_alive:
             self.is_on_surface = False
             self.is_falling = True
 
-            self.current_falling_speed *= GRAVITY_ACCELERATION
+            self.current_falling_speed *= self.gravity_acceleration
             self.y += min(self.current_falling_speed, MAXIMUM_FALLING_SPEED)
 
         else: 
@@ -160,14 +163,19 @@ class Player:
             # Reset falling speed
             self.current_falling_speed = 1
             
-    # Function to update player's animation
+    # Method to update player's hitbox
+    def updateHitbox(self):
+        self.hitbox.x = self.x
+        self.hitbox.y = self.y
+
+    # Method to update player's animation
     def animatePlayerImage(self):
         self.current_frame += 0.2
 
         if self.current_frame >= len(self.current_sprites): 
             self.current_frame = 0
 
-    # Function to animate camera's movement smoothly
+    # Method to animate camera's movement smoothly
     def animateCameraMovement(self):
         movingDistance = self.target_camera_y_offset - self.camera_y_offset
 
@@ -177,7 +185,21 @@ class Player:
             
         # Player fell back to initial position
         elif movingDistance < 0 and self.target_camera_y_offset == 0:
-            self.camera_y_offset -= max(movingDistance / 5, 5)
+            self.camera_y_offset -= max(movingDistance / 5, 10)
 
             # Ensure the camera does not go below 0
             self.camera_y_offset = max(self.camera_y_offset, 0)
+
+    # Method that makes player fall through platforms
+    def die(self):
+        if self.is_alive:
+            self.is_alive = False
+
+            # Player does a tiny jump before falling
+            self.current_jumping_strength = 15
+            self.jump(override_surface_condition = True)
+
+            # Rotate images 180 degrees and store them back to be used in rendering
+            self.sprites_idle = [pygame.transform.rotate(img, 180) for img in self.sprites_idle]    
+            self.sprites_right = [pygame.transform.rotate(img, 180) for img in self.sprites_right]
+            self.sprites_left = [pygame.transform.rotate(img, 180) for img in self.sprites_left]

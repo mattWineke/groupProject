@@ -14,7 +14,7 @@ Game: Pluto’s Pursuit
         	Attributes: position, size
         	Methods: applyEffect(), move()
     o	PowerUp:
-        	Attributes: position, size, type (slowMotion, superJump, invincibility)
+        	Attributes: position, size, type (slowMotion, superJump, scoreBoost)
         	Methods: applyEffect(), disappear()
         
 •	Game Flow:
