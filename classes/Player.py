@@ -7,7 +7,7 @@ SCREEN_RIGHT = 400
 
 STARTING_X_POSITION = 50
 
-INITIAL_GRAVITY_ACCELERATION = 1.25
+GRAVITY_ACCELERATION = 1.25
 MAXIMUM_FALLING_SPEED = 40
 JUMPING_STRENGTH = 50
 
@@ -30,7 +30,6 @@ class Player:
         self.speed = 10
 
         # Gravity controls
-        self.gravity_acceleration = INITIAL_GRAVITY_ACCELERATION
         self.is_on_surface = True
         self.is_jumping = False
         self.current_falling_speed = 1
@@ -99,7 +98,7 @@ class Player:
             self.y -= self.current_jumping_strength
 
             # Make jumping strength weaker
-            self.current_jumping_strength /= self.gravity_acceleration
+            self.current_jumping_strength /= GRAVITY_ACCELERATION
 
             # If the jumping strength is too weak, stop going up
             if self.current_jumping_strength < 1:
@@ -123,9 +122,8 @@ class Player:
                 player_is_on_platform = True
                 platformYPosition = platform.y - platform.height
 
-                # Break the platform if it has breakable type
-                if platform.type == "breakable":
-                    platform.broken = True
+                # Set platform's touched attribute to true
+                platform.touched = True
 
                 # Adjust camera
                 self.target_camera_y_offset = CAMERA_FOLLOW_OFFSET - self.y
@@ -142,7 +140,7 @@ class Player:
             self.is_on_surface = False
             self.is_falling = True
 
-            self.current_falling_speed *= self.gravity_acceleration
+            self.current_falling_speed *= GRAVITY_ACCELERATION
             self.y += min(self.current_falling_speed, MAXIMUM_FALLING_SPEED)
 
         else: 

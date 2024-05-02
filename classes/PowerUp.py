@@ -23,14 +23,14 @@ class PowerUp:
         return self.hitbox.colliderect(target.hitbox)
 
     # Method to apply a certain effect depending on the type of power-up 
-    def applyEffect(self, player, score):
+    def applyEffect(self, player, settings):
         if self.type == 'slowMotion':
-            self.slowMotion(player.speed, player.gravity_acceleration)
+            settings["frame_rate"] = self.slowMotion(settings["frame_rate"])
         elif self.type == 'superJump':
-            self.superJump(player.current_jumping_strength)
+            player.current_jumping_strength = self.superJump(player.current_jumping_strength)
         elif self.type == 'scoreBoost':
-            self.scoreBoost(score)
-    
+            settings["score"] = self.scoreBoost(settings["score"])
+
     # Method to update power-up's hitbox
     def updateHitbox(self):
         self.hitbox.x = self.x
@@ -45,18 +45,21 @@ class PowerUp:
             return "slowMotion"
 
         # Create a super-jump power-up - 33% chance
-        elif random_number < 33:
+        elif random_number < 66:
             return "superJump"
 
         # Create a score boost power-up - 34% chance
         else:
             return "scoreBoost"
         
-    def slowMotion(self, playerSpeed, gravityAcceleration):
-        pass # Code to slow movement
+    def slowMotion(self, frame_rate):
+        # Code to slow down movement
+        return frame_rate
         
     def superJump(self, jumpStrength):
-        pass # Code to change jump strength
+        # Code to change jump strength
+        return jumpStrength
         
     def scoreBoost(self, score):
-        pass # Code to increase score
+        # Code to increase score
+        return score

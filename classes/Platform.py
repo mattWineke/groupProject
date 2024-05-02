@@ -10,16 +10,18 @@ class Platform:
         self.color = color
 
         self.type = self.determinePlatformType()
-        self.broken = False
+
+        self.touched = False
+        self.hasChangedScore = False
 
         self.hasObstacle = False
         self.hasPowerUp = False
 
-        # Set an obstacle: 100% / 5 = 20% Chance
+        # Place an obstacle: 100% / 5 = 20% Chance
         if self.oneInXChances(5):
             self.hasObstacle = True
 
-        # Set an power-up: (100% - 20%) / 8 = 10% Chance            
+        # Place a power-up: (100% - 20%) / 8 = 10% Chance            
         elif self.oneInXChances(8):
             self.hasPowerUp = True
 
@@ -47,6 +49,7 @@ class Platform:
         else:
             return "breakable"
         
+    # There is one in {argument} chances method returns true
     def oneInXChances(self, x):
         return random.randint(1, 100) <= 100 / x
 
@@ -57,8 +60,8 @@ class Platform:
 
     # Method that gets called every frame if it's a breakable platform
     def checkIfPlatformShouldBreak(self):
-        # self.broken is set to True when player jumps on it
-        if self.broken:
+        # self.touched is set to True when player jumps on it
+        if self.touched:
             pass # Code to break platform
 
     # Since the collision functionality is already implemented, we don't need a function that returns the platform's information anymore.
