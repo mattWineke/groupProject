@@ -4,7 +4,7 @@ import random
 
 from classes.Player import Player
 from classes.Platform import Platform
-from classes.Obstacle import Obstacle
+from classes.Enemy import Enemy
 from classes.PowerUp import PowerUp
 from classes.Database import Database
         
@@ -21,12 +21,7 @@ WHITE = (255, 255, 255)
         
 # Initialize Pygame
 pygame.init() 
-load = pygame.image.load
-characterPath = "images/background"  
-
 surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-bg = load(f"{characterPath}/space.png")
-
 pygame.display.set_caption("Pluto's Pursuit")
 clock = pygame.time.Clock()
 
@@ -35,6 +30,10 @@ pygame.font.init()
 font_size = 30
 font_margin = 20
 game_font = pygame.font.Font(None, font_size)
+
+# Load background image
+backgroundPath = "images/background" 
+bg = pygame.image.load(f"{backgroundPath}/space.png")
 
 # Database instance
 db = Database()
@@ -54,7 +53,7 @@ DYNAMIC = {
 
 # Lists with game objects
 PLATFORMS = []
-OBSTACLES = []
+ENEMIES = []
 POWERUPS = []
 
 def main():
@@ -128,15 +127,16 @@ def main():
                 DYNAMIC["score"] += 1
                 platform.hasChangedScore = True
 
-        # Draw obstacles
-        for obstacle in OBSTACLES:
-            pygame.draw.rect(surface, RED, pygame.Rect(obstacle.x, obstacle.y + pluto.camera_y_offset, obstacle.width, obstacle.height))
+        # Draw enemies
+        for enemy in ENEMIES:
+            surface.blit(enemy.current_sprite, enemy.sprite_rect)
+            enemy.sprite_rect.update(enemy.x, enemy.y + pluto.camera_y_offset, enemy.width, enemy.height)
 
-            # Update Obstacle instance every frame
-            obstacle.tick()
+            # Update Enemy instance every frame
+            enemy.tick()
 
-            # Handle obstacle collision with pluto
-            if obstacle.collidedWith(pluto): pluto.die()
+            # Handle enemy collision with pluto
+            if enemy.collidedWith(pluto): pluto.die()
 
         # Draw power-ups
         for powerup in POWERUPS:
@@ -167,8 +167,6 @@ def main():
         high_score_coordinates = (WINDOW_WIDTH - high_score_text_width - font_margin, font_margin)
         surface.blit(high_score_surface, high_score_coordinates)
 
-        
-        
 
         # Update the display
         pygame.display.flip()
@@ -182,14 +180,14 @@ def main():
 
     # Exit game
     pygame.quit()
-    sys.exit()  
+    sys.exit()
 
 
-# Function to fill the PLATFORMS, OBSTACLES and POWERUPS lists with respective instances
+# Function to fill the PLATFORMS, ENEMIES and POWERUPS lists with respective instances
 def createObjects():
     PLATFORM_GAP = 200
     PADDING = 20
-    PLATFORM_WIDTH = 120
+    PLATFORM_WIDTH = 125
     CAMERA_UPPER_BOUND = -pluto.camera_y_offset
 
     last_platform_y_position = PLATFORMS[-1].y if PLATFORMS else WINDOW_HEIGHT - PADDING
@@ -202,13 +200,13 @@ def createObjects():
 
         PLATFORMS.append(platform_instance)
 
-        # Add an obstacle if needed
-        if platform_instance.hasObstacle:
+        # Add an enemy if needed
+        if platform_instance.hasEnemy:
             possible_x_values = [platform_instance.x, platform_instance.x + platform_instance.width]
             y_position = platform_instance.y
-            obstacle_instance = Obstacle(possible_x_values, y_position)
+            enemy_instance = Enemy(possible_x_values, y_position)
             
-            OBSTACLES.append(obstacle_instance)
+            ENEMIES.append(enemy_instance)
 
         # Add a power-up if needed
         elif platform_instance.hasPowerUp:
@@ -220,12 +218,12 @@ def createObjects():
 
 # Function to remove the platforms that have gone off-screen
 def removeOffScreenObjects():
-    global PLATFORMS, OBSTACLES, POWERUPS
+    global PLATFORMS, ENEMIES, POWERUPS
     CAMERA_LOWER_BOUND = WINDOW_HEIGHT - pluto.camera_y_offset
 
-    # Filter out the platforms, obstacles and power-ups whose y-coordinate is below the camera's lower bound
+    # Filter out the platforms, enemies, and power-ups whose y-coordinate is below the camera's lower bound
     PLATFORMS = [platform for platform in PLATFORMS if platform.y < CAMERA_LOWER_BOUND]
-    OBSTACLES = [obstacle for obstacle in OBSTACLES if obstacle.y < CAMERA_LOWER_BOUND]
+    ENEMIES = [enemy for enemy in ENEMIES if enemy.y < CAMERA_LOWER_BOUND]
     POWERUPS = [powerup for powerup in POWERUPS if powerup.y < CAMERA_LOWER_BOUND]
 
 

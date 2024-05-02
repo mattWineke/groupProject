@@ -2,8 +2,8 @@ import pygame
 
 # Named variables
 SCREEN_BOTTOM = 700
-SCREEN_LEFT = -15
-SCREEN_RIGHT = 400
+SCREEN_LEFT = -40
+SCREEN_RIGHT = 390
 
 STARTING_X_POSITION = 50
 
@@ -58,7 +58,7 @@ class Player:
         self.width = self.sprite_rect.width
         self.height = self.sprite_rect.height
 
-        self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.hitbox = pygame.Rect(self.x, self.y, self.width - 15, self.height)
         
 
     def __str__(self): #toString method for testing
@@ -116,11 +116,12 @@ class Player:
         
         for platform in platforms:
             # Create a hitbox for each platform considering pluto's width
-            platform_hitbox = pygame.Rect(platform.x + self.width / 2.5, platform.y, platform.width - self.width / 2, platform.height)
+            trim_width = 12
+            platform_hitbox = pygame.Rect(platform.x + trim_width, platform.y, platform.width - trim_width * 2, platform.height)
 
             if self.hitbox.colliderect(platform_hitbox):
                 player_is_on_platform = True
-                platformYPosition = platform.y - platform.height
+                platformYPosition = platform.y - self.height + 2 # Add 2 pixels to avoid character jounce glitch
 
                 # Set platform's touched attribute to true
                 platform.touched = True
@@ -130,7 +131,7 @@ class Player:
                     
                 break
 
-        return player_is_on_platform, platformYPosition - self.width
+        return player_is_on_platform, platformYPosition
 
     def fall(self, surfaces):
         # Check is the player is on a platform

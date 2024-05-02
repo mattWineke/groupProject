@@ -14,12 +14,12 @@ class Platform:
         self.touched = False
         self.hasChangedScore = False
 
-        self.hasObstacle = False
+        self.hasEnemy = False
         self.hasPowerUp = False
 
-        # Place an obstacle: 100% / 5 = 20% Chance
+        # Place an enemy: 100% / 5 = 20% Chance
         if self.oneInXChances(5):
-            self.hasObstacle = True
+            self.hasEnemy = True
 
         # Place a power-up: (100% - 20%) / 8 = 10% Chance            
         elif self.oneInXChances(8):
