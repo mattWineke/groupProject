@@ -189,7 +189,7 @@ def main():
 def createObjects():
     PLATFORM_GAP = 200
     PADDING = 20
-    PLATFORM_WIDTH = 344
+    PLATFORM_WIDTH = 132
     CAMERA_UPPER_BOUND = -pluto.camera_y_offset
 
     last_platform_y_position = PLATFORMS[-1].y if PLATFORMS else WINDOW_HEIGHT - PADDING

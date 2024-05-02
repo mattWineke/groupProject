@@ -17,7 +17,7 @@ class Platform:
         self.y = y
 
         # Set current sprite and initialize sprite rectangle
-        self.sprite_rect = self.platform_sprite.get_rect(topleft=(344, 65))
+        self.sprite_rect = self.platform_sprite.get_rect(center=(self.x, self.y))
 
         self.type = self.determinePlatformType()
 
