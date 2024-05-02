@@ -18,8 +18,13 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
         
 # Initialize Pygame
-pygame.init()    
+pygame.init() 
+load = pygame.image.load
+characterPath = "images/background"  
+
 surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+bg = load(f"{characterPath}/space.png")
+
 pygame.display.set_caption("Pluto's Pursuit")
 clock = pygame.time.Clock()
 
@@ -86,7 +91,7 @@ def main():
 
 
         # Draw background
-        surface.fill(BLACK)
+        surface.blit(bg, (0, 0))
         
         # Draw pluto's satellite
         SATELLITE_RADIUS = 10
@@ -123,6 +128,9 @@ def main():
             # Handle power-up collision with pluto
             if powerup.collidedWith(pluto): powerup.applyEffect(pluto, score)
 
+
+        
+        
 
         # Update the display
         pygame.display.flip()
