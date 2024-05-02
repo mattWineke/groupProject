@@ -198,6 +198,9 @@ class Player:
             self.current_jumping_strength = 15
             self.jump(override_surface_condition = True)
 
+            # Reset falling speed
+            self.current_falling_speed = 1
+
             # Rotate images 180 degrees and store them back to be used in rendering
             self.sprites_idle = [pygame.transform.rotate(img, 180) for img in self.sprites_idle]    
             self.sprites_right = [pygame.transform.rotate(img, 180) for img in self.sprites_right]

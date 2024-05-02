@@ -2,7 +2,7 @@ import random
 
 class Platform:
     # Constructor for Platform class
-    def __init__(self, x, y, width = 100, height = 15, color = "white"):           
+    def __init__(self, x, y, width = 100, height = 15, color = "white", currentScore = 0):           
         self.x = x
         self.y = y
         self.width = width
@@ -17,12 +17,12 @@ class Platform:
         self.hasEnemy = False
         self.hasPowerUp = False
 
-        # Place an enemy: 100% / 5 = 20% Chance
-        if self.oneInXChances(5):
+        # Place an enemy: Chances increase as score does - At 200 there is an enemy on (almost) every platform
+        if self.oneInXChances(max(5 - currentScore / 50, 1.1)):
             self.hasEnemy = True
 
-        # Place a power-up: (100% - 20%) / 8 = 10% Chance            
-        elif self.oneInXChances(8):
+        # Place a power-up: Chances increase as score does - Enemies still have priority over power-ups    
+        elif self.oneInXChances(max(3 - currentScore / 100, 1)):
             self.hasPowerUp = True
 
     # Method that gets called every frame

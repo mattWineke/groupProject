@@ -2,7 +2,7 @@ import pygame
 import random
 
 # Named Variables
-HITBOX_SHRINK_FACTOR = 10  # Make the game somewhat forgiving
+HITBOX_SHRINK_FACTOR = 5  # Make the game somewhat forgiving
 
 class Enemy:
     # Constructor for Enemy class
@@ -25,10 +25,10 @@ class Enemy:
         # Movement controls
         self.moving_enemy = self.oneInXChances(3) # ~33% chance
         self.speed = random.random() * 2
-        self.direction = 1  # 1 for right, -1 for left
+        self.direction = random.choice([-1, 1])  # 1 for right, -1 for left
 
         # Set current sprite and initialize sprite rectangle
-        self.current_sprite = random.choice([self.sprite_left, self.sprite_right])
+        self.current_sprite = self.sprite_right if self.direction == 1 else self.sprite_left
         self.sprite_rect = self.current_sprite.get_rect(center=(self.x, self.y))
 
         # Initialize enemy's hitbox

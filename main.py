@@ -196,7 +196,7 @@ def createObjects():
     if not PLATFORMS or last_platform_y_position > CAMERA_UPPER_BOUND:
         new_platform_y_position = last_platform_y_position - PLATFORM_GAP
         new_platform_x_position = random.randint(PADDING, WINDOW_WIDTH - PLATFORM_WIDTH - PADDING)
-        platform_instance = Platform(new_platform_x_position, new_platform_y_position, PLATFORM_WIDTH)
+        platform_instance = Platform(new_platform_x_position, new_platform_y_position, PLATFORM_WIDTH, currentScore = DYNAMIC["score"])
 
         PLATFORMS.append(platform_instance)
 
