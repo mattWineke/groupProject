@@ -109,7 +109,8 @@ def main():
         
         # Draw pluto's satellite
         SATELLITE_RADIUS = 10
-        pygame.draw.circle(surface, "red", (pluto.x, pluto.y + pluto.camera_y_offset), SATELLITE_RADIUS)
+        SATELLITE_COLOR = (min(DYNAMIC["score"] * 255 / 200, 255), max(255 - DYNAMIC["score"] * 255 / 200, 0), 0) # (Red, Green, Blue) - 255: Max Intensity - 200: Score satellite is totally red
+        pygame.draw.circle(surface, SATELLITE_COLOR, (pluto.x, pluto.y + pluto.camera_y_offset), SATELLITE_RADIUS)
 
         # Draw pluto
         surface.blit(pluto.current_sprites[int(pluto.current_frame)], pluto.sprite_rect)
