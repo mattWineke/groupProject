@@ -11,6 +11,7 @@ class Enemy:
         enemyPath = "images/enemy"
         self.sprite_left = pygame.image.load(f"{enemyPath}/SpacemiteL.png")
         self.sprite_right = pygame.image.load(f"{enemyPath}/SpacemiteR.png")
+        self.current_sprite = self.sprite_left
 
         # Enemy's dimensions
         self.width = self.sprite_right.get_rect().width  # Get the width from the sprite
