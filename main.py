@@ -6,36 +6,50 @@ from classes.Player import Player
 from classes.Platform import Platform
 from classes.Enemy import Enemy
 from classes.PowerUp import PowerUp
+from classes.Database import Database
         
 # Named variables
 WINDOW_WIDTH = 400
 WINDOW_HEIGHT = 800
-FRAME_RATE = 45
 
-# Won't be needed after objects get images
+# Most colors won't be needed after objects get images
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
+LIGHT_GREEN = (100, 255, 100)
+WHITE = (255, 255, 255)
         
 # Initialize Pygame
 pygame.init() 
-load = pygame.image.load
-characterPath = "images/background"  
-
 surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-bg = load(f"{characterPath}/space.png")
-
 pygame.display.set_caption("Pluto's Pursuit")
 clock = pygame.time.Clock()
 
-# Player Object instance
+# Initialize Font
+pygame.font.init()
+font_size = 30
+font_margin = 20
+game_font = pygame.font.Font(None, font_size)
+
+# Load background image
+backgroundPath = "images/background" 
+bg = pygame.image.load(f"{backgroundPath}/space.png")
+
+# Database instance
+db = Database()
+
+# Player instance
 pluto = Player()
 
 # Set window icon to one of pluto's images
 pygame.display.set_icon(pluto.sprites_right[0])
 
-# Will be updated in the main loop and attached to a label on the top left
-score = 0
+# Dictionary to store dynamic variables
+DYNAMIC = {
+    "frame_rate": 45,
+    "score": 0,
+    "high_score": db.get_high_score()
+}
 
 # Lists with game objects
 PLATFORMS = []
@@ -103,20 +117,23 @@ def main():
 
         # Draw platforms
         for platform in PLATFORMS:
-            platform_rect = pygame.draw.rect(surface, platform.color, pygame.Rect(platform.x, platform.y + pluto.camera_y_offset, platform.width, platform.height))
-
-            surface.blit(platform.platform_sprite, platform_rect)
+            surface.blit(platform.platform_sprite, platform.sprite_rect)
+            platform.sprite_rect.update(platform.x, platform.y + pluto.camera_y_offset, platform.width, platform.height)
 
             # Update Platform instance every frame
             platform.tick()
 
+            # Increase score if the platform is touched for the first time
+            if platform.touched and not platform.hasChangedScore: 
+                DYNAMIC["score"] += 1
+                platform.hasChangedScore = True
+
         # Draw enemies
         for enemy in ENEMIES:
-
             surface.blit(enemy.current_sprite, enemy.sprite_rect)
-            enemy.sprite_rect.update(enemy.x, enemy.y, enemy.width, enemy.height)
+            enemy.sprite_rect.update(enemy.x, enemy.y + pluto.camera_y_offset, enemy.width, enemy.height)
 
-            # Update enemy instance every frame
+            # Update Enemy instance every frame
             enemy.tick()
 
             # Handle enemy collision with pluto
@@ -130,28 +147,49 @@ def main():
             powerup.tick()
 
             # Handle power-up collision with pluto
-            if powerup.collidedWith(pluto): powerup.applyEffect(pluto, score)
+            if powerup.collidedWith(pluto): 
+                powerup.applyEffect(pluto, DYNAMIC)
+
+                # Move power-up out of the screen so it's deleted by removeOffScreenObjects function
+                powerup.y = WINDOW_HEIGHT * 2
 
 
+        # Display current score
+        score_text = f"Score: {DYNAMIC['score']}"
+        score_surface = game_font.render(score_text, True, WHITE)
+        score_coordinates = (font_margin, font_margin)
+        surface.blit(score_surface, score_coordinates)
+
+        # Display high score
+        high_score_text = f"High Score: {max(DYNAMIC['high_score'], DYNAMIC['score'])}"
+        high_score_color = WHITE if DYNAMIC["score"] <= DYNAMIC["high_score"] else LIGHT_GREEN # Change text color if new high score is being set
+        high_score_surface = game_font.render(high_score_text, True, high_score_color)
+        high_score_text_width = high_score_surface.get_width()
+        high_score_coordinates = (WINDOW_WIDTH - high_score_text_width - font_margin, font_margin)
+        surface.blit(high_score_surface, high_score_coordinates)
         
-        
+
 
         # Update the display
         pygame.display.flip()
 
         # Set frame rate
-        clock.tick(FRAME_RATE)
+        clock.tick(DYNAMIC["frame_rate"])
+
+    # If there's a new high score, save it
+    if DYNAMIC["score"] > DYNAMIC["high_score"]: 
+        db.set_high_score(DYNAMIC["score"])
 
     # Exit game
     pygame.quit()
-    sys.exit()  
+    sys.exit()
 
 
 # Function to fill the PLATFORMS, ENEMIES and POWERUPS lists with respective instances
 def createObjects():
     PLATFORM_GAP = 200
     PADDING = 20
-    PLATFORM_WIDTH = 120
+    PLATFORM_WIDTH = 344
     CAMERA_UPPER_BOUND = -pluto.camera_y_offset
 
     last_platform_y_position = PLATFORMS[-1].y if PLATFORMS else WINDOW_HEIGHT - PADDING
@@ -160,7 +198,7 @@ def createObjects():
     if not PLATFORMS or last_platform_y_position > CAMERA_UPPER_BOUND:
         new_platform_y_position = last_platform_y_position - PLATFORM_GAP
         new_platform_x_position = random.randint(PADDING, WINDOW_WIDTH - PLATFORM_WIDTH - PADDING)
-        platform_instance = Platform(new_platform_x_position, new_platform_y_position, PLATFORM_WIDTH)
+        platform_instance = Platform(new_platform_x_position, new_platform_y_position, currentScore = DYNAMIC["score"])
 
         PLATFORMS.append(platform_instance)
 
@@ -168,7 +206,7 @@ def createObjects():
         if platform_instance.hasEnemy:
             possible_x_values = [platform_instance.x, platform_instance.x + platform_instance.width]
             y_position = platform_instance.y
-            enemy_instance = Enemy(possible_x_values, y_position) # enemies # space mite img needed
+            enemy_instance = Enemy(possible_x_values, y_position)
             
             ENEMIES.append(enemy_instance)
 
@@ -185,7 +223,7 @@ def removeOffScreenObjects():
     global PLATFORMS, ENEMIES, POWERUPS
     CAMERA_LOWER_BOUND = WINDOW_HEIGHT - pluto.camera_y_offset
 
-    # Filter out the platforms, enemies and power-ups whose y-coordinate is below the camera's lower bound
+    # Filter out the platforms, enemies, and power-ups whose y-coordinate is below the camera's lower bound
     PLATFORMS = [platform for platform in PLATFORMS if platform.y < CAMERA_LOWER_BOUND]
     ENEMIES = [enemy for enemy in ENEMIES if enemy.y < CAMERA_LOWER_BOUND]
     POWERUPS = [powerup for powerup in POWERUPS if powerup.y < CAMERA_LOWER_BOUND]
