@@ -3,15 +3,23 @@ import random
 
 class PowerUp:
     # Constructor for PowerUp class
-    def __init__(self, possibleXValues, y, width = 20, height = 20):
+    def __init__(self, possibleXValues, y, color = "green", width = 20, height = 20):
+        # Power-up's initial coordinates
         self.possible_x_values = possibleXValues
         self.x = random.randint(possibleXValues[0], possibleXValues[1] - width)
         self.y = y - height # Subtract height to make sure it is shown on top of the surface it was placed on
+
+        # Power-up's dimensions
         self.width = width
         self.height = height
 
+        # Power-up's color
+        self.color = color
+
+        # Set power-up's type
         self.type = self.determineType()
 
+        # Initialize power-up's hitbox
         self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
 
     # Method that gets called every frame
@@ -23,13 +31,17 @@ class PowerUp:
         return self.hitbox.colliderect(target.hitbox)
 
     # Method to apply a certain effect depending on the type of power-up 
-    def applyEffect(self, player, settings):
-        if self.type == 'slowMotion':
-            settings["frame_rate"] = self.slowMotion(settings["frame_rate"])
-        elif self.type == 'superJump':
-            player.current_jumping_strength = self.superJump(player.current_jumping_strength)
-        elif self.type == 'scoreBoost':
-            settings["score"] = self.scoreBoost(settings["score"])
+    def applyEffect(self, controls, frameRate):
+        if self.type == 'invincibility':
+            controls["invincibility"]["timer"] = frameRate * 3 # Make power-up last 3 seconds
+
+        elif self.type == 'double_points':
+            controls["double_points"]["timer"] = frameRate * 5 # Make power-up last 5 seconds
+
+        elif self.type == 'score_boost':
+            controls["score_boost"]["timer"] = frameRate * 0.8 # For animation purposes
+            
+            controls["score"] += 5
 
     # Method to update power-up's hitbox
     def updateHitbox(self):
@@ -40,26 +52,16 @@ class PowerUp:
     def determineType(self):
         random_number = random.randint(1, 100)
 
-        # Create a slow-motion power-up - 33% chance
+        # Create an invincibility power-up - 33% chance
         if random_number < 33:
-            return "slowMotion"
+            self.color = "blue"
+            return "invincibility"
 
-        # Create a super-jump power-up - 33% chance
+        # Create a double-points power-up - 33% chance
         elif random_number < 66:
-            return "superJump"
+            self.color = "darkorchid2"
+            return "double_points"
 
-        # Create a score boost power-up - 34% chance
+        # Create a score-boost power-up - 34% chance
         else:
-            return "scoreBoost"
-        
-    def slowMotion(self, frame_rate):
-        # Code to slow down movement
-        return frame_rate
-        
-    def superJump(self, jumpStrength):
-        # Code to change jump strength
-        return jumpStrength
-        
-    def scoreBoost(self, score):
-        # Code to increase score
-        return score
+            return "score_boost"

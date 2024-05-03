@@ -116,7 +116,7 @@ class Player:
         
         for platform in platforms:
             # Create a hitbox for each platform considering pluto's width
-            trim_width = 12
+            trim_width = 15
             platform_hitbox = pygame.Rect(platform.x + trim_width, platform.y, platform.width - trim_width * 2, platform.height)
 
             if self.hitbox.colliderect(platform_hitbox):

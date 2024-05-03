@@ -7,15 +7,15 @@ from classes.Platform import Platform
 from classes.Enemy import Enemy
 from classes.PowerUp import PowerUp
 from classes.Database import Database
+
+from animations.easeInAndOut import *
         
 # Named variables
 WINDOW_WIDTH = 400
 WINDOW_HEIGHT = 800
+FRAME_RATE = 45
 
-# Most colors won't be needed after objects get images
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
+# Color RGB codes
 LIGHT_GREEN = (100, 255, 100)
 WHITE = (255, 255, 255)
         
@@ -27,9 +27,9 @@ clock = pygame.time.Clock()
 
 # Initialize Font
 pygame.font.init()
-font_size = 30
+font_size = 25
 font_margin = 20
-game_font = pygame.font.Font(None, font_size)
+game_font = pygame.font.SysFont('calibri, helvetica, arial', font_size, bold = True)
 
 # Load background image
 backgroundPath = "images/background" 
@@ -46,9 +46,20 @@ pygame.display.set_icon(pluto.sprites_right[0])
 
 # Dictionary to store dynamic variables
 DYNAMIC = {
-    "frame_rate": 45,
     "score": 0,
-    "high_score": db.get_high_score()
+    "high_score": db.get_high_score(),
+    "invincibility": {
+        "active": False,
+        "timer": 0
+    },
+    "double_points": {
+        "active": False,
+        "timer": 0
+    },
+    "score_boost": {
+        "active": False,
+        "timer": 0
+    },
 }
 
 # Lists with game objects
@@ -70,6 +81,9 @@ def main():
         # Manage game objects
         createObjects()
         removeOffScreenObjects()
+
+        # Manage power-up effects
+        handlePowerups()
 
         # Update Player instance every frame
         pluto.tick(surfaces = PLATFORMS)
@@ -109,12 +123,35 @@ def main():
         
         # Draw pluto's satellite
         SATELLITE_RADIUS = 10
-        SATELLITE_COLOR = (min(DYNAMIC["score"] * 255 / 200, 255), max(255 - DYNAMIC["score"] * 255 / 200, 0), 0) # (Red, Green, Blue) - 255: Max Intensity - 200: Score satellite is totally red
+        SATELLITE_COLOR = (
+            min(DYNAMIC["score"] * 255 / 200, 255), # Red value: (score:value) 0:0, 200:255
+            max(255 - DYNAMIC["score"] * 255 / 200, 0), # Green value: (score:value) 0:255, 200:0
+            0, # Blue value
+        )
         pygame.draw.circle(surface, SATELLITE_COLOR, (pluto.x, pluto.y + pluto.camera_y_offset), SATELLITE_RADIUS)
 
         # Draw pluto
         surface.blit(pluto.current_sprites[int(pluto.current_frame)], pluto.sprite_rect)
         pluto.sprite_rect.update(pluto.x, pluto.y + pluto.camera_y_offset, pluto.width, pluto.height)
+
+        # Draw active power-up visual effect
+        if DYNAMIC["invincibility"]["active"]:
+            # Draw a force field around Pluto
+            easeCircleInAndOut(surface, RGB_color = (0, 0, 255), center = pluto.sprite_rect.center, initial_radius = 0, max_radius = pluto.height, 
+                               max_alpha = 40, total_duration = 3, time_left = DYNAMIC["invincibility"]["timer"] / FRAME_RATE, animation_duration = 0.2)
+            
+        if DYNAMIC["score_boost"]["active"]:
+            # Draw "+5" next to Pluto
+            easeTextInAndOut(surface, game_font, text = "+5", initial_size = 0, max_size = 30, color = "green",
+                             center = (pluto.x + pluto.width, pluto.y + pluto.camera_y_offset), total_duration = 0.8,
+                             time_left = DYNAMIC["score_boost"]["timer"] / FRAME_RATE, animation_duration = 0.2)
+            
+        elif DYNAMIC["double_points"]["active"]:
+            # Draw "2x" next to Pluto
+            easeTextInAndOut(surface, game_font, text = "2x", initial_size = 0, max_size = 30, color = "darkorchid2",
+                             center = (pluto.x + pluto.width, pluto.y + pluto.camera_y_offset), total_duration = 5,
+                             time_left = DYNAMIC["double_points"]["timer"] / FRAME_RATE, animation_duration = 0.3)
+            
 
         # Draw platforms
         for platform in PLATFORMS:
@@ -125,8 +162,8 @@ def main():
             platform.tick()
 
             # Increase score if the platform is touched for the first time
-            if platform.touched and not platform.hasChangedScore: 
-                DYNAMIC["score"] += 1
+            if platform.touched and not platform.hasChangedScore:
+                DYNAMIC["score"] += 2 if DYNAMIC["double_points"]["active"] else 1
                 platform.hasChangedScore = True
 
         # Draw enemies
@@ -138,18 +175,19 @@ def main():
             enemy.tick()
 
             # Handle enemy collision with pluto
-            if enemy.collidedWith(pluto): pluto.die()
+            if enemy.collidedWith(pluto): 
+                enemy.die() if DYNAMIC["invincibility"]["active"] else pluto.die()
 
         # Draw power-ups
         for powerup in POWERUPS:
-            pygame.draw.rect(surface, GREEN, pygame.Rect(powerup.x, powerup.y + pluto.camera_y_offset, powerup.width, powerup.height))
+            pygame.draw.rect(surface, powerup.color, pygame.Rect(powerup.x, powerup.y + pluto.camera_y_offset, powerup.width, powerup.height))
 
             # Update Power-Up instance every frame
             powerup.tick()
 
             # Handle power-up collision with pluto
             if powerup.collidedWith(pluto): 
-                powerup.applyEffect(pluto, DYNAMIC)
+                powerup.applyEffect(DYNAMIC, FRAME_RATE)
 
                 # Move power-up out of the screen so it's deleted by removeOffScreenObjects function
                 powerup.y = WINDOW_HEIGHT * 2
@@ -175,7 +213,7 @@ def main():
         pygame.display.flip()
 
         # Set frame rate
-        clock.tick(DYNAMIC["frame_rate"])
+        clock.tick(FRAME_RATE)
 
     # If there's a new high score, save it
     if DYNAMIC["score"] > DYNAMIC["high_score"]: 
@@ -228,6 +266,24 @@ def removeOffScreenObjects():
     PLATFORMS = [platform for platform in PLATFORMS if platform.y < CAMERA_LOWER_BOUND]
     ENEMIES = [enemy for enemy in ENEMIES if enemy.y < CAMERA_LOWER_BOUND]
     POWERUPS = [powerup for powerup in POWERUPS if powerup.y < CAMERA_LOWER_BOUND]
+
+
+# Function to remove power-up effects
+def handlePowerups():
+    global DYNAMIC
+
+    # Iterate through each key and nested dictionary in DYNAMIC
+    for key, value in DYNAMIC.items():
+        # Check if the current item is a dictionary and has a 'timer' key
+        if isinstance(value, dict) and 'timer' in value:
+            # Check if the timer is 0
+            if value['timer'] == 0:
+                # Set the 'active' property to False
+                value['active'] = False
+            else:
+                # Decrement the timer and ensure 'active' is True
+                value['timer'] -= 1
+                value['active'] = True
 
 
 # Function to check if the player has lost

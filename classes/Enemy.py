@@ -7,6 +7,8 @@ HITBOX_SHRINK_FACTOR = 5  # Make the game somewhat forgiving
 class Enemy:
     # Constructor for Enemy class
     def __init__(self, possibleXValues, y):
+        self.is_alive = True
+        
         # Load sprites
         enemyPath = "images/enemy"
         self.sprite_left = pygame.image.load(f"{enemyPath}/SpacemiteL.png")
@@ -46,23 +48,25 @@ class Enemy:
     # Method that gets called every frame
     def tick(self):
         self.updateHitbox()
-        if self.moving_enemy: self.move()
+
+        if not self.is_alive: self.die()
+        elif self.moving_enemy: self.move()
 
     # Move the enemy considering platform surface
     def move(self):
         self.x += self.speed * self.direction
 
         # If enemy has reached platform border
-        if self.x <= self.min_x_value or self.x >= self.max_x_value:
+        if self.x < self.min_x_value or self.x > self.max_x_value:
             # Reverse direction
             self.direction *= -1
 
             # Update sprite
             self.current_sprite = self.sprite_left if self.direction == -1 else self.sprite_right
 
-    # Returns true if the enemy touches the target
+    # Returns true if the enemy touches the target while being alive
     def collidedWith(self, target):
-        return self.hitbox.colliderect(target.hitbox)
+        return self.hitbox.colliderect(target.hitbox) and self.is_alive
     
     # Method to update ememy's hitbox, making sure it's centered
     def updateHitbox(self):
@@ -73,3 +77,18 @@ class Enemy:
     # There is one in {argument} chances method returns true
     def oneInXChances(self, x):
         return random.randint(1, 100) <= 100 / x
+    
+    # Method that makes enemy fly away
+    def die(self):
+        if self.is_alive:
+            self.is_alive = False
+            self.current_sprite = pygame.transform.rotate(self.sprite_left, 35)
+
+        # Check if the enemy is out of the screen
+        if self.x + self.width > 0:
+            self.x -= 15
+            self.y -= 60
+
+        else:
+            # Move the enemy below the screen so it's deleted by removeOffScreenObjects function
+            self.y = 2000

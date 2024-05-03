@@ -19,8 +19,10 @@ class Platform:
         # Set current sprite and initialize sprite rectangle
         self.sprite_rect = self.platform_sprite.get_rect(center=(self.x, self.y))
 
+        # Set platform type
         self.type = self.determinePlatformType()
 
+        # Platform's state
         self.touched = False
         self.hasChangedScore = False
 
@@ -32,7 +34,7 @@ class Platform:
             self.hasEnemy = True
 
         # Place a power-up: Chances increase as score does - Enemies still have priority over power-ups    
-        elif self.oneInXChances(max(3 - currentScore / 100, 1)):
+        elif self.oneInXChances(max(5 - currentScore / 50, 1.5)):
             self.hasPowerUp = True
 
     # Method that gets called every frame
@@ -73,5 +75,3 @@ class Platform:
         # self.touched is set to True when player jumps on it
         if self.touched:
             pass # Code to break platform
-
-    # Since the collision functionality is already implemented, we don't need a function that returns the platform's information anymore.
