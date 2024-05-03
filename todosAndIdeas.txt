@@ -9,11 +9,14 @@ TO-DOS:
     - Moving platforms
     - Breakable platforms
     - Images:
-        - +5 Power-up
-        - x2 Power-up
+        - Invincibility Power-up
+        - Double-points Power-up
         - Score-boost Power-up
         - Moving platforms
         - Breakable platforms
+        - Surface that pluto stands on at the beginning (e.g. moon)
+
+    - Organize presentation (introduction, main points, class interaction, etc.)
 
 IDEAS:
     - Extra-life power-up
@@ -21,3 +24,4 @@ IDEAS:
     - Use a prettier font
     - Image for non-moving enemy
     - Decrease background image's size
+    - When invincible, enemies fly away in a different direction depending on how they're hit
