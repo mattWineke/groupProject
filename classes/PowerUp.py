@@ -9,9 +9,21 @@ class PowerUp:
         self.x = random.randint(possibleXValues[0], possibleXValues[1] - width)
         self.y = y - height # Subtract height to make sure it is shown on top of the surface it was placed on
 
-        # Power-up's dimensions
-        self.width = width
-        self.height = height
+        # load sprite images
+        powerupPath = "images/powerups"
+        self.powerup1 = pygame.image.load(f"{powerupPath}/powerup1.png")
+        self.powerup2 = pygame.image.load(f"{powerupPath}/powerup2.png")
+        self.powerup3 = pygame.image.load(f"{powerupPath}/powerup3.png")
+
+         # powerup's dimensions
+        self.powerup1_width = self.powerup1.get_rect().width  # Get the width from the sprite
+        self.powerup1_height = self.powerup1.get_rect().height  # Get the height from the sprite
+
+        self.powerup2_width = self.powerup2.get_rect().width  # Get the width from the sprite
+        self.powerup2_height = self.powerup2.get_rect().height  # Get the height from the sprite
+
+        self.powerup3_width = self.powerup3.get_rect().width  # Get the width from the sprite
+        self.powerup3_height = self.powerup3.get_rect().height  # Get the height from the spri
 
         # Power-up's color
         self.color = color
@@ -55,13 +67,35 @@ class PowerUp:
         # Create an invincibility power-up - 33% chance
         if random_number < 33:
             self.color = "blue"
+            # Set width for current sprite
+            self.width = self.powerup1_width
+            self.height = self.powerup1_height
+            # powerupsprite set to the current power up sprite
+            self.powerupsprite = self.powerup1
+            # power up rect
+            self.sprite_rect = self.powerupsprite.get_rect(center=(self.x, self.y))
             return "invincibility"
 
         # Create a double-points power-up - 33% chance
         elif random_number < 66:
             self.color = "darkorchid2"
+            # Set width for current sprite
+            self.width = self.powerup2_width
+            self.height = self.powerup2_height
+            # powerupsprite set to the current power up sprite
+            self.powerupsprite = self.powerup2
+            # power up rect
+            self.sprite_rect = self.powerupsprite.get_rect(center=(self.x, self.y))
             return "double_points"
 
         # Create a score-boost power-up - 34% chance
         else:
+            # Set width for current sprite
+            self.width = self.powerup3_width
+            self.height = self.powerup3_height
+            # powerupsprite set to the current power up sprite
+            self.powerupsprite = self.powerup3
+            # power up rect
+            self.sprite_rect = self.powerupsprite.get_rect(center=(self.x, self.y))
+            
             return "score_boost"
