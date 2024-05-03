@@ -180,8 +180,9 @@ def main():
 
         # Draw power-ups
         for powerup in POWERUPS:
-            pygame.draw.rect(surface, powerup.color, pygame.Rect(powerup.x, powerup.y + pluto.camera_y_offset, powerup.width, powerup.height))
-
+            # Draw the power-ups
+            surface.blit(powerup.powerupsprite, powerup.sprite_rect)
+            powerup.sprite_rect.update(powerup.x, powerup.y + pluto.camera_y_offset, powerup.width, powerup.height)
             # Update Power-Up instance every frame
             powerup.tick()
 
