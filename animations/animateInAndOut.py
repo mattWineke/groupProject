@@ -1,7 +1,8 @@
+# Functions to animate pygame objects when appearing and disappearing
+
 import pygame
 
-# Function to style power-up effects
-def easeTextInAndOut(surface, font, text, initial_size, max_size, color, center, total_duration, time_left, animation_duration):
+def animateTextInAndOut(surface, font, text, initial_size, max_size, color, center, total_duration, time_left, animation_duration):
     time_passed = total_duration - time_left
 
     # Calculate current text scale
@@ -33,7 +34,7 @@ def easeTextInAndOut(surface, font, text, initial_size, max_size, color, center,
     # Display the text
     surface.blit(text_surface, text_rect)
 
-def easeCircleInAndOut(surface, RGB_color, center, initial_radius, max_radius, max_alpha, total_duration, time_left, animation_duration):
+def animateCircleInAndOut(surface, RGB_color, center, initial_radius, max_radius, max_alpha, total_duration, time_left, animation_duration):
     time_passed = total_duration - time_left
 
     # Calculate current circle scale

@@ -8,7 +8,7 @@ from classes.Enemy import Enemy
 from classes.PowerUp import PowerUp
 from classes.Database import Database
 
-from animations.easeInAndOut import *
+from animations.animateInAndOut import *
         
 # Named variables
 WINDOW_WIDTH = 400
@@ -137,18 +137,18 @@ def main():
         # Draw active power-up visual effect
         if DYNAMIC["invincibility"]["active"]:
             # Draw a force field around Pluto
-            easeCircleInAndOut(surface, RGB_color = (0, 0, 255), center = pluto.sprite_rect.center, initial_radius = 0, max_radius = pluto.height, 
+            animateCircleInAndOut(surface, RGB_color = (0, 0, 255), center = pluto.sprite_rect.center, initial_radius = 0, max_radius = pluto.height, 
                                max_alpha = 40, total_duration = 3, time_left = DYNAMIC["invincibility"]["timer"] / FRAME_RATE, animation_duration = 0.2)
             
         if DYNAMIC["score_boost"]["active"]:
             # Draw "+5" next to Pluto
-            easeTextInAndOut(surface, game_font, text = "+5", initial_size = 0, max_size = 30, color = "green",
+            animateTextInAndOut(surface, game_font, text = "+5", initial_size = 0, max_size = 30, color = "green",
                              center = (pluto.x + pluto.width, pluto.y + pluto.camera_y_offset), total_duration = 0.8,
                              time_left = DYNAMIC["score_boost"]["timer"] / FRAME_RATE, animation_duration = 0.2)
             
         elif DYNAMIC["double_points"]["active"]:
             # Draw "2x" next to Pluto
-            easeTextInAndOut(surface, game_font, text = "2x", initial_size = 0, max_size = 30, color = "darkorchid2",
+            animateTextInAndOut(surface, game_font, text = "2x", initial_size = 0, max_size = 30, color = "darkorchid2",
                              center = (pluto.x + pluto.width, pluto.y + pluto.camera_y_offset), total_duration = 5,
                              time_left = DYNAMIC["double_points"]["timer"] / FRAME_RATE, animation_duration = 0.3)
             

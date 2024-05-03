@@ -1,0 +1,23 @@
+A file to keep track of project's to-dos and ideas!
+
+Please feel free to add or delete anything - any idea (big or small) is accepted.
+Write your name next to a task or idea if you want to implement it - that way we won't have multiple people overriding their work.
+
+TO-DOS:
+    - Start Game Screen
+    - End Game Screen
+    - Moving platforms
+    - Breakable platforms
+    - Images:
+        - +5 Power-up
+        - x2 Power-up
+        - Score-boost Power-up
+        - Moving platforms
+        - Breakable platforms
+
+IDEAS:
+    - Extra-life power-up
+    - Music and sound effects
+    - Use a prettier font
+    - Image for non-moving enemy
+    - Decrease background image's size
