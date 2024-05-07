@@ -16,7 +16,7 @@ class Platform:
         self.x = x
         self.y = y
 
-        # Set current sprite and initialize sprite rectangle
+        # Initialize sprite rectangle
         self.sprite_rect = self.platform_sprite.get_rect(center=(self.x, self.y))
 
         # Set platform type

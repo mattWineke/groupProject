@@ -9,9 +9,6 @@ TO-DOS:
     - Moving platforms
     - Breakable platforms
     - Images:
-        - Invincibility Power-up
-        - Double-points Power-up
-        - Score-boost Power-up
         - Moving platforms
         - Breakable platforms
         - Surface that pluto stands on at the beginning (e.g. moon)
@@ -23,5 +20,4 @@ IDEAS:
     - Music and sound effects
     - Use a prettier font
     - Image for non-moving enemy
-    - Decrease background image's size
     - When invincible, enemies fly away in a different direction depending on how they're hit

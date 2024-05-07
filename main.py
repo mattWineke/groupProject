@@ -26,14 +26,15 @@ pygame.display.set_caption("Pluto's Pursuit")
 clock = pygame.time.Clock()
 
 # Initialize Font
-pygame.font.init()
 font_size = 25
 font_margin = 20
 game_font = pygame.font.SysFont('calibri, helvetica, arial', font_size, bold = True)
 
 # Load background image
-backgroundPath = "images/background" 
-bg = pygame.image.load(f"{backgroundPath}/space.png")
+bg = pygame.image.load(f"images/background/space.png")
+
+# Load satellite image
+satellite_sprite = pygame.image.load("images/character/plutos_satalite.PNG")
 
 # Database instance
 db = Database()
@@ -122,11 +123,10 @@ def main():
         surface.blit(bg, (0, 0))
         
         # Draw pluto's satellite
-        SATELLITE_RADIUS = 1
+        SATELLITE_DISTANCE = 15
+        SATELLITE_POSITION = (pluto.x - SATELLITE_DISTANCE, pluto.y - SATELLITE_DISTANCE + pluto.camera_y_offset)
             
-        satalite = pygame.image.load("images/character/plutos_satalite.PNG")
-        satalite_circle = pygame.draw.circle(surface, "black", (pluto.x, pluto.y + pluto.camera_y_offset), SATELLITE_RADIUS)
-        surface.blit(satalite, satalite_circle)
+        surface.blit(satellite_sprite, SATELLITE_POSITION)
             
         # Draw pluto
         surface.blit(pluto.current_sprites[int(pluto.current_frame)], pluto.sprite_rect)
@@ -146,7 +146,7 @@ def main():
             
         elif DYNAMIC["double_points"]["active"]:
             # Draw "2x" next to Pluto
-            animateTextInAndOut(surface, game_font, text = "2x", initial_size = 0, max_size = 30, color = "darkorchid2",
+            animateTextInAndOut(surface, game_font, text = "2x", initial_size = 0, max_size = 30, color = "dodgerblue2",
                              center = (pluto.x + pluto.width, pluto.y + pluto.camera_y_offset), total_duration = 5,
                              time_left = DYNAMIC["double_points"]["timer"] / FRAME_RATE, animation_duration = 0.3)
             
@@ -178,9 +178,9 @@ def main():
 
         # Draw power-ups
         for powerup in POWERUPS:
-            # Draw the power-ups
-            surface.blit(powerup.powerupsprite, powerup.sprite_rect)
+            surface.blit(powerup.powerup_sprite, powerup.sprite_rect)
             powerup.sprite_rect.update(powerup.x, powerup.y + pluto.camera_y_offset, powerup.width, powerup.height)
+
             # Update Power-Up instance every frame
             powerup.tick()
 
