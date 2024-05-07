@@ -9,7 +9,6 @@ TO-DOS:
     - Images:
         - Moving platforms (Hayden)
         - Surface that pluto stands on at the beginning (Hayden)
-        - Image for non-moving enemy (Hayden)
 
 IDEAS:
     - Music and sound effects (Matthew)

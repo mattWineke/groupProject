@@ -51,6 +51,7 @@ platformImages = {
 enemyImages = {
     'left': load(f"{enemyPath}/SpacemiteL.png"),
     'right': load(f"{enemyPath}/SpacemiteR.png"),
+    'idle': load(f"{enemyPath}/Space_Slime.png"),
 }
 powerupImages = {
     'invincibility': load(f"{powerupPath}/powerup1.png"),

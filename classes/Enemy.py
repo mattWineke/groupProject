@@ -14,14 +14,15 @@ class Enemy:
         # Load sprites
         self.sprite_left = sprites["left"]
         self.sprite_right = sprites["right"]
+        self.sprite_idle = sprites["idle"]
 
         # Set current sprite and initialize sprite rectangle
-        self.current_sprite = self.sprite_right if self.direction == 1 else self.sprite_left
+        self.current_sprite = (self.sprite_right if self.direction == 1 else self.sprite_left) if self.moving_enemy else self.sprite_idle
         self.sprite_rect = self.current_sprite.get_rect(y = -500) # -500 to make sure the enemy appears out of the screen
 
         # Enemy's dimensions
         self.width = self.sprite_rect.width
-        self.height = self.sprite_rect.height
+        self.height = self.sprite_rect.height - 2
         
         # Enemy's initial coordinates
         self.min_x_value = possibleXValues[0]
