@@ -59,7 +59,7 @@ def main():
         draw_text("How to Play", button_font, BLACK, screen, how_to_play_button.x + 20, how_to_play_button.y + 15)
 
         # Draw title
-        draw_text("Pluto's Pursuit", title_font, YELLOW, screen, WIDTH//2, 100)
+        draw_text("Pluto's Pursuit", title_font, bLUE, screen, WIDTH//2, 100)
 
         # Draw platform
         pygame.draw.rect(screen, GRAY, (100, 300, 600, 20))
@@ -71,10 +71,14 @@ def main():
     pygame.quit()
     sys.exit()
 
-background = pygame.image.load("space background.png")  # Load your background image
+background = pygame.image.load("images/background/space.png")  # Load your background image
 screen.blit(background, (0, 0))  # Blit the background image to the screen
-Character = pygame.image.load("L1Pluto.png")  #load the character image
-Character = pygame.image.load("L2Pluto.png") 
+Character = pygame.image.load("images/character/L1Pluto.png")  #load the character image
+Character = pygame.image.load("images/character/R1Pluto.png")
+screen.blit(background, (0, 0))  # Blit the background image to the screen
+
+
+
  # Draw characters, obstacles, etc. 
 
 def draw_text(text, font, color, surface, x, y):
@@ -87,8 +91,4 @@ def draw_text(text, font, color, surface, x, y):
 if __name__ == "__main__":
     main()
     
-        # Draw objects
-        screen.blit(background, (0, 0))  # Blit the background image to the screen
-
-
 
