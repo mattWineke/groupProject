@@ -361,7 +361,7 @@ def displayEndScreen():
         # Key controls
         keys = pygame.key.get_pressed()
         if keys[pygame.K_q] or keys[pygame.K_e]: exitGame()
-        elif keys[pygame.K_a] or keys[pygame.K_p]: startGame()
+        elif keys[pygame.K_a] or keys[pygame.K_p] or keys[pygame.K_DOWN] or keys[pygame.K_s]: startGame()
 
         # Update the display
         pygame.display.flip()
