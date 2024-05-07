@@ -1,12 +1,12 @@
 import pygame
 import sys
-import random
 
 from classes.Player import Player
 from classes.Platform import Platform
 from classes.Enemy import Enemy
 from classes.PowerUp import PowerUp
 from classes.Database import Database
+from classes.Button import Button
 
 from animations.animateInAndOut import *
 
@@ -17,6 +17,8 @@ FRAME_RATE = 45
 
 # Color RGB codes
 LIGHT_GREEN = (100, 255, 100)
+BLUE = (30, 30, 255)
+LIGHT_BLUE = (70, 70, 255)
 WHITE = (255, 255, 255)
 
 # Initialize Pygame
@@ -26,19 +28,21 @@ pygame.display.set_caption("Pluto's Pursuit")
 clock = pygame.time.Clock()
 
 # Initialize Font
+FONT_FAMILY = "calibri, helvetica, arial"
 font_size = 25
 font_margin = 20
-game_font = pygame.font.SysFont('calibri, helvetica, arial', font_size, bold = True)
+game_font = pygame.font.SysFont(FONT_FAMILY, font_size, bold = True)
 
 # Load images
 load = pygame.image.load
+backgroundPath = "images/background"
 characterPath = "images/character"
 platformPath = "images/platforms"
 enemyPath = "images/enemy"
 powerupPath = "images/powerups"
 
-background_image = load(f"images/background/space.png")
-cloud_image = load(f"images/background/clouds.png")
+background_image = load(f"{backgroundPath}/space.png")
+cloud_image = load(f"{backgroundPath}/clouds.png")
 satellite_image = load(f"{characterPath}/plutos_satalite.png")
 playerImages = {
     "right": [load(f"{characterPath}/R1Pluto.png"), load(f"{characterPath}/R2Pluto.png"), load(f"{characterPath}/R3Pluto.png"), load(f"{characterPath}/R4Pluto.png")],
@@ -90,16 +94,19 @@ PLATFORMS = []
 ENEMIES = []
 POWERUPS = []
 
-def main():
-    # Flag to control game state
-    running = True
+# Flag to control game state
+running = True
 
+def main():
+    global running
+    running = True
+    
     # Main loop
     while running:
         # Event loop
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                exitGame()
 
         # Manage game objects
         createObjects()
@@ -136,17 +143,14 @@ def main():
         if keys[pygame.K_SPACE] or keys[pygame.K_UP] or keys[pygame.K_w]:
             pluto.jump()
 
-        # Print pluto's info when pressing p
-        if keys[pygame.K_p]:
-            print(pluto)
-
 
         # Draw background
         surface.blit(background_image, (0, 0))
 
-        # Draw clouds
-        CLOUDS_POSITION = (0, WINDOW_HEIGHT - (cloud_image.get_rect().height - 50) + pluto.camera_y_offset)
-        surface.blit(cloud_image, CLOUDS_POSITION)
+        # Draw clouds if player's score is less than 15
+        if (DYNAMIC["score"] < 15):
+            CLOUDS_POSITION = (0, WINDOW_HEIGHT - (cloud_image.get_rect().height - 50) + pluto.camera_y_offset)
+            surface.blit(cloud_image, CLOUDS_POSITION)
         
         # Draw pluto's satellite
         SATELLITE_POSITION = (pluto.x - PLUTO_PERSONAL_SPACE, pluto.y - PLUTO_PERSONAL_SPACE + pluto.camera_y_offset)
@@ -238,13 +242,8 @@ def main():
         # Set frame rate
         clock.tick(FRAME_RATE)
 
-    # If there's a new high score, save it
-    if DYNAMIC["score"] > DYNAMIC["high_score"]: 
-        db.set_high_score(DYNAMIC["score"])
-
-    # Exit game
-    pygame.quit()
-    sys.exit()
+    # Display end screen
+    displayEndScreen()
 
 
 # Function to fill the PLATFORMS, ENEMIES and POWERUPS lists with respective instances
@@ -289,24 +288,14 @@ def removeOffScreenObjects():
     ENEMIES = [enemy for enemy in ENEMIES if enemy.y < CAMERA_LOWER_BOUND]
     POWERUPS = [powerup for powerup in POWERUPS if powerup.y < CAMERA_LOWER_BOUND]
 
-
 # Function to remove power-up effects
 def handlePowerups():
-    global DYNAMIC
-
-    # Iterate through each key and nested dictionary in DYNAMIC
-    for key, value in DYNAMIC.items():
-        # Check if the current item is a dictionary and has a 'timer' key
-        if isinstance(value, dict) and 'timer' in value:
-            # Check if the timer is 0
-            if value['timer'] == 0:
-                # Set the 'active' property to False
-                value['active'] = False
-            else:
-                # Decrement the timer and ensure 'active' is True
-                value['timer'] -= 1
-                value['active'] = True
-
+    for powerup in DYNAMIC.values():
+        if isinstance(powerup, dict):
+            # Decrement the timer if necessary
+            powerup['timer'] = max(0, powerup['timer'] - 1)
+            # Set the active property based on the time left on the timer
+            powerup['active'] = powerup['timer'] > 0
 
 # Function to check if the player has lost
 def playerFell():
@@ -320,6 +309,91 @@ def playerFell():
         return True
     else:
         return False
+
+
+# Function to display the end screen
+def displayEndScreen():
+    global running
     
-if __name__ == "__main__":
+    # Named variables
+    BUTTON_WIDTH = 200
+    BUTTON_HEIGHT = 50
+    GAP = 70
+    CONTENT_Y_POSITION = WINDOW_HEIGHT // 2 - 25
+
+    # Initiate score text
+    score_text = f"Final Score: {DYNAMIC['score']}"
+    score_font = pygame.font.SysFont(FONT_FAMILY, 37, bold = True)
+    score_surface = score_font.render(score_text, True, WHITE)
+    score_rect = score_surface.get_rect(center=(WINDOW_WIDTH // 2, CONTENT_Y_POSITION - GAP))
+
+    # Button Instances
+    play_again_button = Button(
+            text="Play Again", function=startGame,
+            x=WINDOW_WIDTH // 4, y=CONTENT_Y_POSITION,
+            width=BUTTON_WIDTH, height=BUTTON_HEIGHT,
+            font=game_font, color=WHITE,
+            backgroundColor=LIGHT_BLUE, hoverColor=BLUE)
+
+    exit_button = Button(
+        text="Exit Game", function=exitGame,
+        x=WINDOW_WIDTH // 4, y=CONTENT_Y_POSITION + GAP,
+        width=BUTTON_WIDTH, height=BUTTON_HEIGHT,
+        font=game_font, color=WHITE,
+        backgroundColor=LIGHT_BLUE, hoverColor=BLUE)
+    
+    while not running:
+        # Event loop
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exitGame()
+
+        # Draw background
+        surface.blit(background_image, (0, 0))
+
+        # Draw the score
+        surface.blit(score_surface, score_rect)
+
+        # Draw buttons
+        play_again_button.draw(surface)
+        exit_button.draw(surface)
+
+        # Key controls
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_q] or keys[pygame.K_e]: exitGame()
+        elif keys[pygame.K_a] or keys[pygame.K_p]: startGame()
+
+        # Update the display
+        pygame.display.flip()
+        clock.tick(FRAME_RATE)
+
+# Function to start a new game
+def startGame():
+    # Reset player instance
+    global pluto
+    pluto = Player(playerImages)
+    
+    # Reset dynamic variables
+    DYNAMIC["high_score"] = max(DYNAMIC["score"], DYNAMIC["high_score"])
+    DYNAMIC["score"] = 0
+    DYNAMIC["invincibility"]["timer"] = 0
+    DYNAMIC["double_points"]["timer"] = 0
+    DYNAMIC["score_boost"]["timer"] = 0
+
+    # Reset objects
+    PLATFORMS.clear()
+    ENEMIES.clear()
+    POWERUPS.clear()
+
+    # Call main function
     main()
+
+# Function to exit the program
+def exitGame():
+    db.set_high_score(DYNAMIC["high_score"])
+    
+    pygame.quit()
+    sys.exit()
+
+if __name__ == "__main__":
+    startGame()

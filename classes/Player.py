@@ -46,7 +46,7 @@ class Player:
         self.current_frame = 0
         
         # Initialize sprite rectangle
-        self.sprite_rect = self.current_sprites[self.current_frame].get_rect()
+        self.sprite_rect = self.current_sprites[self.current_frame].get_rect(topleft = (self.x, self.y))
 
         # Player's dimensions
         self.width = self.sprite_rect.width
@@ -55,10 +55,6 @@ class Player:
         # Initialize player's hitbox
         self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
         
-    # toString method for testing
-    def __str__(self):
-        return "Coordinates: " + str(self.x) + ", " + str(self.y) + ". Speed: "+ str(self.speed)+". Direction: " + self.current_direction + "."
-
     # Method that's called every frame
     def tick(self, platforms):
         self.updateHitbox()

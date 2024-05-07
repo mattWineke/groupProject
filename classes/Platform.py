@@ -28,7 +28,6 @@ class Platform:
         self.hasChangedScore = False
         self.hasEnemy = False
         self.hasPowerUp = False
-        self.shakeOffset = 0
 
         # Movement controls
         self.speed = random.random() * 2
