@@ -73,7 +73,7 @@ def main():
 
 background = pygame.image.load("space background.png")  # Load your background image
 screen.blit(background, (0, 0))  # Blit the background image to the screen
-Characters = pygame.image.load("L1Pluto.png")  #load the character image
+Character = pygame.image.load("L1Pluto.png")  #load the character image
 Character = pygame.image.load("L2Pluto.png") 
  # Draw characters, obstacles, etc. 
 
