@@ -47,7 +47,6 @@ playerImages = {
 platformImages = {
     'normal': load(f"{platformPath}/platform1.png"),
     'moving': load(f"{platformPath}/platform1.png"),
-    'breakable': load(f"{platformPath}/platform1.png"),
 }
 enemyImages = {
     'left': load(f"{enemyPath}/SpacemiteL.png"),
@@ -249,7 +248,6 @@ def main():
 def createObjects():
     PLATFORM_GAP = 200
     PADDING = 20
-    PLATFORM_WIDTH = 132
     CAMERA_UPPER_BOUND = -pluto.camera_y_offset
 
     last_platform_y_position = PLATFORMS[-1].y if PLATFORMS else WINDOW_HEIGHT - PADDING
@@ -257,8 +255,8 @@ def createObjects():
     # Create a new platform if no platforms have been created or if the last platform created is already on the screen
     if not PLATFORMS or last_platform_y_position > CAMERA_UPPER_BOUND:
         new_platform_y_position = last_platform_y_position - PLATFORM_GAP
-        new_platform_x_position = random.randint(PADDING, WINDOW_WIDTH - PLATFORM_WIDTH - PADDING)
-        platform_instance = Platform(platformImages, new_platform_x_position, new_platform_y_position, currentScore = DYNAMIC["score"])
+        possible_x_values = [PADDING, WINDOW_WIDTH - PADDING]
+        platform_instance = Platform(platformImages, possible_x_values, new_platform_y_position, currentScore = DYNAMIC["score"])
 
         PLATFORMS.append(platform_instance)
 

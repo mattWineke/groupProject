@@ -6,13 +6,10 @@ Write your name next to a task or idea if you want to implement it - that way we
 TO-DOS:
     - Start Game Screen (Simran)
     - End Game Screen (Santiago)
-    - Moving platforms (Santiago)
-    - Breakable platforms (Santiago)
     - Images:
         - Moving platforms (Hayden)
-        - Breakable platforms (Hayden)
         - Surface that pluto stands on at the beginning (Hayden)
+        - Image for non-moving enemy (Hayden)
 
 IDEAS:
     - Music and sound effects (Matthew)
-    - Image for non-moving enemy (Hayden)

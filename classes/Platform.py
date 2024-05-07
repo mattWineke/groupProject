@@ -3,7 +3,7 @@ import random
 
 class Platform:
     # Constructor for Platform class
-    def __init__(self, sprites, x, y, currentScore = 0):           
+    def __init__(self, sprites, possibleXValues, y, currentScore = 0):           
         # Set platform type
         self.type = self.determinePlatformType()
         
@@ -18,7 +18,9 @@ class Platform:
         self.height = self.sprite_rect.height
         
         # Platform's initial coordinates
-        self.x = x
+        self.min_x_value = possibleXValues[0]
+        self.max_x_value = possibleXValues[1] - self.width
+        self.x = random.randint(self.min_x_value, self.max_x_value)
         self.y = y
 
         # Platform's state
@@ -26,13 +28,18 @@ class Platform:
         self.hasChangedScore = False
         self.hasEnemy = False
         self.hasPowerUp = False
+        self.shakeOffset = 0
+
+        # Movement controls
+        self.speed = random.random() * 2
+        self.direction = random.choice([-1, 1])  # 1 for right, -1 for left
 
         # Place an enemy: Chances increase as score does - At 200 there is an enemy on (almost) every platform
-        if self.oneInXChances(max(4 - currentScore / (200 / 3), 1.2)):
+        if self.oneInXChances(max(4 - currentScore / (200 / 3), 1.2)) and self.type == "normal":
             self.hasEnemy = True
 
         # Place a power-up: Chances increase as score does - Enemies still have priority over power-ups    
-        elif self.oneInXChances(max(5 - currentScore / (200 / 4), 1.2)):
+        elif self.oneInXChances(max(5 - currentScore / (200 / 4), 1.2)) and self.type == "normal":
             self.hasPowerUp = True
 
         # Initialize platform's hitbox
@@ -45,25 +52,18 @@ class Platform:
         if self.type == "moving":
             self.movePlatform()
 
-        elif self.type == "breakable":
-            self.checkIfPlatformShouldBreak()
-
     # Method to determine platform's type
     def determinePlatformType(self):
         random_number = random.randint(1, 100)
 
-        # Create a normal platform: 60% chance
-        if random_number < 60:
+        # Create a normal platform: 90% chance
+        if random_number < 90:
             return "normal"
 
-        # Create a moving platform: 20% chance
-        elif random_number < 80:
+        # Create a moving platform: 10% chance
+        else:
             return "moving"
 
-        # Create a breakable platform: 20% chance
-        else:
-            return "breakable"
-        
     # There is one in {argument} chances method returns true
     def oneInXChances(self, x):
         return random.randint(1, 100) <= 100 / x
@@ -75,10 +75,9 @@ class Platform:
 
     # Method that gets called every frame if it's a moving platform
     def movePlatform(self):
-        pass # Should make the platform move either up AND down, or left and right in a loop
+        self.x += self.speed * self.direction
 
-    # Method that gets called every frame if it's a breakable platform
-    def checkIfPlatformShouldBreak(self):
-        # self.touched is set to True when player jumps on it
-        if self.touched:
-            pass # Code to break platform
+        # If platform has reached screen edge
+        if self.x < self.min_x_value or self.x > self.max_x_value:
+            # Reverse direction
+            self.direction *= -1
