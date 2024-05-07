@@ -57,8 +57,9 @@ class Enemy:
     
     # Method to update enemy's hitbox
     def updateHitbox(self):
-        self.hitbox.x = self.x
-        self.hitbox.y = self.y
+        TRIM_PX_TOP = 7
+
+        self.hitbox.update(self.x, self.y + TRIM_PX_TOP, self.width, self.height - TRIM_PX_TOP)
 
     # There is one in {argument} chances method returns true
     def oneInXChances(self, x):

@@ -28,11 +28,11 @@ class Platform:
         self.hasPowerUp = False
 
         # Place an enemy: Chances increase as score does - At 200 there is an enemy on (almost) every platform
-        if self.oneInXChances(max(4 - currentScore / 50, 1.1)):
+        if self.oneInXChances(max(4 - currentScore / (200 / 3), 1.2)):
             self.hasEnemy = True
 
         # Place a power-up: Chances increase as score does - Enemies still have priority over power-ups    
-        elif self.oneInXChances(max(5 - currentScore / 50, 1.5)):
+        elif self.oneInXChances(max(5 - currentScore / (200 / 4), 1.2)):
             self.hasPowerUp = True
 
         # Initialize platform's hitbox
