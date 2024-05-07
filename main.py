@@ -154,25 +154,6 @@ def main():
         surface.blit(pluto.current_sprites[int(pluto.current_frame)], pluto.sprite_rect)
         pluto.sprite_rect.update(pluto.x, pluto.y + pluto.camera_y_offset, pluto.width, pluto.height)
 
-        # Draw active power-up visual effect
-        if DYNAMIC["invincibility"]["active"]:
-            # Draw a force field around Pluto
-            animateCircleInAndOut(surface, RGB_color = (0, 0, 255), center = pluto.sprite_rect.center, initial_radius = 0, max_radius = pluto.height, 
-                               max_alpha = 40, total_duration = 3, time_left = DYNAMIC["invincibility"]["timer"] / FRAME_RATE, animation_duration = 0.2)
-            
-        if DYNAMIC["score_boost"]["active"]:
-            # Draw "+5" next to Pluto
-            animateTextInAndOut(surface, game_font, text = "+5", initial_size = 0, max_size = 30, color = "green",
-                             center = (pluto.x + pluto.width + PLUTO_PERSONAL_SPACE, pluto.y + pluto.camera_y_offset), total_duration = 0.8,
-                             time_left = DYNAMIC["score_boost"]["timer"] / FRAME_RATE, animation_duration = 0.2)
-            
-        elif DYNAMIC["double_points"]["active"]:
-            # Draw "2x" next to Pluto
-            animateTextInAndOut(surface, game_font, text = "2x", initial_size = 0, max_size = 30, color = "dodgerblue2",
-                             center = (pluto.x + pluto.width + PLUTO_PERSONAL_SPACE, pluto.y + pluto.camera_y_offset), total_duration = 5,
-                             time_left = DYNAMIC["double_points"]["timer"] / FRAME_RATE, animation_duration = 0.3)
-            
-
         # Draw platforms
         for platform in PLATFORMS:
             surface.blit(platform.platform_sprite, platform.sprite_rect)
@@ -212,6 +193,25 @@ def main():
 
                 # Move power-up out of the screen so it's deleted by removeOffScreenObjects function
                 powerup.y = WINDOW_HEIGHT * 2
+
+
+        # Draw active power-up's visual effect
+        if DYNAMIC["invincibility"]["active"]:
+            # Draw a force field around Pluto
+            animateCircleInAndOut(surface, RGB_color = (0, 0, 255), center = pluto.sprite_rect.center, initial_radius = 0, max_radius = pluto.height, 
+                               max_alpha = 40, total_duration = 3, time_left = DYNAMIC["invincibility"]["timer"] / FRAME_RATE, animation_duration = 0.2)
+            
+        if DYNAMIC["score_boost"]["active"]:
+            # Draw "+5" next to Pluto
+            animateTextInAndOut(surface, game_font, text = "+5", initial_size = 0, max_size = 30, color = "green",
+                             center = (pluto.x + pluto.width + PLUTO_PERSONAL_SPACE, pluto.y + pluto.camera_y_offset), total_duration = 0.8,
+                             time_left = DYNAMIC["score_boost"]["timer"] / FRAME_RATE, animation_duration = 0.2)
+            
+        elif DYNAMIC["double_points"]["active"]:
+            # Draw "2x" next to Pluto
+            animateTextInAndOut(surface, game_font, text = "2x", initial_size = 0, max_size = 30, color = "dodgerblue2",
+                             center = (pluto.x + pluto.width + PLUTO_PERSONAL_SPACE, pluto.y + pluto.camera_y_offset), total_duration = 5,
+                             time_left = DYNAMIC["double_points"]["timer"] / FRAME_RATE, animation_duration = 0.3)
 
 
         # Display current score

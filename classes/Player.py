@@ -55,8 +55,8 @@ class Player:
         # Initialize player's hitbox
         self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
         
-
-    def __str__(self): #toString method for testing
+    # toString method for testing
+    def __str__(self):
         return "Coordinates: " + str(self.x) + ", " + str(self.y) + ". Speed: "+ str(self.speed)+". Direction: " + self.current_direction + "."
 
     # Method that's called every frame
@@ -69,7 +69,8 @@ class Player:
             self.jump(override_surface_condition=True)
         else:
             self.fall(platforms)
-        
+
+    # Method to manage player's x position
     def move(self, pixels_to_move):
         self.x += pixels_to_move
 
@@ -83,7 +84,7 @@ class Player:
         elif self.x >= SCREEN_RIGHT + LOOPING_OFFSET:
             self.x = SCREEN_LEFT
 
-
+    # Method to handle jump animation
     def jump(self, override_surface_condition = False):
         if self.is_on_surface or override_surface_condition:
             self.is_on_surface = False
@@ -124,6 +125,7 @@ class Player:
 
         return player_is_on_platform, platformYPosition
 
+    # Method to handle falling animation
     def fall(self, platforms):
         # Check is the player is on a platform
         isOnPlatform, platformYPosition = self.isOnPlatform(platforms)

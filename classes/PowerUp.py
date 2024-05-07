@@ -48,8 +48,9 @@ class PowerUp:
 
     # Method to update power-up's hitbox
     def updateHitbox(self):
-        self.hitbox.x = self.x
-        self.hitbox.y = self.y
+        EXTRA_PX_SIDES = 10
+
+        self.hitbox.update(self.x - EXTRA_PX_SIDES, self.y, self.width + EXTRA_PX_SIDES * 2, self.height)
 
     # Method to determine power-up's type
     def determineType(self):
