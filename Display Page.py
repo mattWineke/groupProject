@@ -71,6 +71,12 @@ def main():
     pygame.quit()
     sys.exit()
 
+background = pygame.image.load("space background.png")  # Load your background image
+screen.blit(background, (0, 0))  # Blit the background image to the screen
+Character = pygame.image.load("L1Pluto.png")  #load the character image
+Character = pygame.image.load("L2Pluto.png") 
+ # Draw characters, obstacles, etc. 
+
 def draw_text(text, font, color, surface, x, y):
     text_obj = font.render(text, True, color)
     text_rect = text_obj.get_rect()
@@ -80,12 +86,9 @@ def draw_text(text, font, color, surface, x, y):
 # Run the main function
 if __name__ == "__main__":
     main()
-
-        
+    
         # Draw objects
-        # Draw a background
-        # background = pygame.image.load("background.png")  # Load your background image
-        # screen.blit(background, (0, 0))  # Blit the background image to the screen
+        screen.blit(background, (0, 0))  # Blit the background image to the screen
 
-        # Draw characters, obstacles, etc.
+
 
