@@ -1,7 +1,7 @@
 import pygame
 
 # Named variables
-SCREEN_BOTTOM = 700
+SCREEN_BOTTOM = 710
 SCREEN_LEFT = -40
 SCREEN_RIGHT = 390
 

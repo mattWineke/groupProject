@@ -145,7 +145,7 @@ def main():
         surface.blit(background_image, (0, 0))
 
         # Draw clouds
-        CLOUDS_POSITION = (0, WINDOW_HEIGHT - cloud_image.get_rect().height + pluto.camera_y_offset)
+        CLOUDS_POSITION = (0, WINDOW_HEIGHT - (cloud_image.get_rect().height - 50) + pluto.camera_y_offset)
         surface.blit(cloud_image, CLOUDS_POSITION)
         
         # Draw pluto's satellite
