@@ -95,7 +95,7 @@ class Platform:
         # self.touched is set to True when player jumps on it
         if self.touched:
             # Code to break platform
-            self.platform_sprite = pygame.image.load("broken_platform.png")
+            self.platform_sprite = pygame.image.load("broken_platform.png")  #do we have a broken platform animation??
 
 # Main game loop
 running = True
