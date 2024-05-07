@@ -3,32 +3,24 @@ import random
 
 class PowerUp:
     # Constructor for PowerUp class
-    def __init__(self, possibleXValues, y):
+    def __init__(self, powerupImages, possibleXValues, y):
         # Set power-up's type
         self.type = self.determineType()
         
-        # Power-ups' images
-        powerupPath = "images/powerups"
-        powerupImages = {
-            'invincibility': f"{powerupPath}/powerup1.png",
-            'double_points': f"{powerupPath}/powerup2.png",
-            'score_boost': f"{powerupPath}/powerup3.png"
-        }
-
         # Load appropriate sprite
-        self.powerup_sprite = pygame.image.load(powerupImages[self.type])
+        self.powerup_sprite = powerupImages[self.type]
+
+        # Initialize sprite rectangle
+        self.sprite_rect = self.powerup_sprite.get_rect(y = -500) # -500 to make sure the power-up appears out of the screen
 
         # Powerup's dimensions
-        self.width = self.powerup_sprite.get_rect().width
-        self.height = self.powerup_sprite.get_rect().height
+        self.width = self.sprite_rect.width
+        self.height = self.sprite_rect.height
 
         # Power-up's coordinates
         self.possible_x_values = possibleXValues
         self.x = random.randint(possibleXValues[0], possibleXValues[1] - self.width)
         self.y = y - self.height # Subtract height to make sure it is shown on top of the surface it was placed on
-
-        # Initialize sprite rectangle
-        self.sprite_rect = self.powerup_sprite.get_rect(center=(self.x, self.y))
 
         # Initialize power-up's hitbox
         self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)

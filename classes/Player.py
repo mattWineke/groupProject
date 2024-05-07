@@ -15,7 +15,7 @@ CAMERA_FOLLOW_OFFSET = SCREEN_BOTTOM - 300  # Position where the camera will pla
 
 class Player:
     # Constructor for Player class
-    def __init__(self):
+    def __init__(self, sprites):
         self.is_alive = True
         
         # Player's coordinates
@@ -35,37 +35,32 @@ class Player:
         self.current_falling_speed = 1
         self.current_jumping_strength = JUMPING_STRENGTH
 
-        
-        # Lists with Sprite animation frames
-        load = pygame.image.load
-        characterPath = "images/character"
+        # Load sprites
+        self.sprites_right = sprites["right"]
+        self.sprites_left = sprites["left"]
+        self.sprites_idle = sprites["idle"]
 
-        self.sprites_right = [load(f"{characterPath}/R1Pluto.png"), load(f"{characterPath}/R2Pluto.png"),
-                 load(f"{characterPath}/R3Pluto.png"), load(f"{characterPath}/R4Pluto.png") ]
-        self.sprites_left = [load(f"{characterPath}/L1Pluto.png"), load(f"{characterPath}/L2Pluto.png"),
-                load(f"{characterPath}/L3Pluto.png"), load(f"{characterPath}/L4Pluto.png")]
-        self.sprites_idle = [load(f"{characterPath}/I1Pluto.png"), load(f"{characterPath}/I2Pluto.png"),
-                        load(f"{characterPath}/I3Pluto.png"), load(f"{characterPath}/I4Pluto.png")]
-
-        # Variables to store player's current direction, for the sprite animations
+        # Player's state
         self.current_direction = "idle"
-        self.current_sprites = self.sprites_idle # Current sprite list
-        self.current_frame = 0 # Current index of the sprite frames
+        self.current_sprites = self.sprites_idle
+        self.current_frame = 0
         
-        self.sprite_rect = self.sprites_right[0].get_rect(center=[self.x, self.y])
+        # Initialize sprite rectangle
+        self.sprite_rect = self.current_sprites[self.current_frame].get_rect()
 
         # Player's dimensions
         self.width = self.sprite_rect.width
         self.height = self.sprite_rect.height
 
-        self.hitbox = pygame.Rect(self.x, self.y, self.width - 15, self.height)
+        # Initialize player's hitbox
+        self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
         
 
     def __str__(self): #toString method for testing
         return "Coordinates: " + str(self.x) + ", " + str(self.y) + ". Speed: "+ str(self.speed)+". Direction: " + self.current_direction + "."
 
     # Method that's called every frame
-    def tick(self, surfaces = []):
+    def tick(self, platforms):
         self.updateHitbox()
         self.animatePlayerImage()
         self.animateCameraMovement()
@@ -73,7 +68,7 @@ class Player:
         if self.is_jumping:
             self.jump(override_surface_condition=True)
         else:
-            self.fall(surfaces)
+            self.fall(platforms)
         
     def move(self, pixels_to_move):
         self.x += pixels_to_move
@@ -115,11 +110,7 @@ class Player:
         platformYPosition = 0
         
         for platform in platforms:
-            # Create a hitbox for each platform considering pluto's width
-            trim_width = 15
-            platform_hitbox = pygame.Rect(platform.x + trim_width, platform.y, platform.width - trim_width * 2, platform.height)
-
-            if self.hitbox.colliderect(platform_hitbox):
+            if self.hitbox.colliderect(platform.hitbox):
                 player_is_on_platform = True
                 platformYPosition = platform.y - self.height + 2 # Add 2 pixels to avoid character jounce glitch
 
@@ -133,9 +124,9 @@ class Player:
 
         return player_is_on_platform, platformYPosition
 
-    def fall(self, surfaces):
+    def fall(self, platforms):
         # Check is the player is on a platform
-        isOnPlatform, platformYPosition = self.isOnPlatform(surfaces)
+        isOnPlatform, platformYPosition = self.isOnPlatform(platforms)
         
         if self.y < SCREEN_BOTTOM and not isOnPlatform or not self.is_alive:
             self.is_on_surface = False
@@ -164,8 +155,10 @@ class Player:
             
     # Method to update player's hitbox
     def updateHitbox(self):
-        self.hitbox.x = self.x
-        self.hitbox.y = self.y
+        TRIM_PX_LEFT = 15
+        TRIM_PX_RIGHT = 15
+
+        self.hitbox.update(self.x + TRIM_PX_LEFT, self.y, self.width - TRIM_PX_LEFT - TRIM_PX_RIGHT, self.height)
 
     # Method to update player's animation
     def animatePlayerImage(self):

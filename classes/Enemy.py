@@ -1,22 +1,27 @@
 import pygame
 import random
 
-# Named Variables
-HITBOX_SHRINK_FACTOR = 5  # Make the game somewhat forgiving
-
 class Enemy:
     # Constructor for Enemy class
-    def __init__(self, possibleXValues, y):
+    def __init__(self, sprites, possibleXValues, y):
         self.is_alive = True
         
+        # Movement controls
+        self.moving_enemy = self.oneInXChances(3) # ~33% chance
+        self.speed = random.random() * 2
+        self.direction = random.choice([-1, 1])  # 1 for right, -1 for left
+        
         # Load sprites
-        enemyPath = "images/enemy"
-        self.sprite_left = pygame.image.load(f"{enemyPath}/SpacemiteL.png")
-        self.sprite_right = pygame.image.load(f"{enemyPath}/SpacemiteR.png")
+        self.sprite_left = sprites["left"]
+        self.sprite_right = sprites["right"]
+
+        # Set current sprite and initialize sprite rectangle
+        self.current_sprite = self.sprite_right if self.direction == 1 else self.sprite_left
+        self.sprite_rect = self.current_sprite.get_rect(y = -500) # -500 to make sure the enemy appears out of the screen
 
         # Enemy's dimensions
-        self.width = self.sprite_right.get_rect().width  # Get the width from the sprite
-        self.height = self.sprite_right.get_rect().height  # Get the height from the sprite
+        self.width = self.sprite_rect.width
+        self.height = self.sprite_rect.height
         
         # Enemy's initial coordinates
         self.min_x_value = possibleXValues[0]
@@ -24,31 +29,13 @@ class Enemy:
         self.x = random.randint(self.min_x_value, self.max_x_value)
         self.y = y - self.height  # Adjust y to ensure it's shown on top of the surface it was placed on
 
-        # Movement controls
-        self.moving_enemy = self.oneInXChances(3) # ~33% chance
-        self.speed = random.random() * 2
-        self.direction = random.choice([-1, 1])  # 1 for right, -1 for left
-
-        # Set current sprite and initialize sprite rectangle
-        self.current_sprite = self.sprite_right if self.direction == 1 else self.sprite_left
-        self.sprite_rect = self.current_sprite.get_rect(center=(self.x, self.y))
-
         # Initialize enemy's hitbox
-        self.initHitbox()
-
-    # Initializes enemy's hitbox
-    def initHitbox(self):
-        hitbox_width = self.width / HITBOX_SHRINK_FACTOR
-        hitbox_height = self.height / HITBOX_SHRINK_FACTOR
-        hitbox_x = self.x + (self.width - hitbox_width) / 2
-        hitbox_y = self.y + (self.height - hitbox_height) / 2
-
-        self.hitbox = pygame.Rect(hitbox_x, hitbox_y, hitbox_width, hitbox_height)
+        self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
 
     # Method that gets called every frame
     def tick(self):
         self.updateHitbox()
-
+        
         if not self.is_alive: self.die()
         elif self.moving_enemy: self.move()
 
@@ -68,11 +55,10 @@ class Enemy:
     def collidedWith(self, target):
         return self.hitbox.colliderect(target.hitbox) and self.is_alive
     
-    # Method to update ememy's hitbox, making sure it's centered
+    # Method to update enemy's hitbox
     def updateHitbox(self):
-        hitbox_x = self.x + (self.width - self.hitbox.width) / 2
-        hitbox_y = self.y + (self.height - self.hitbox.height) / 2
-        self.hitbox.update(hitbox_x, hitbox_y, self.hitbox.width, self.hitbox.height)
+        self.hitbox.x = self.x
+        self.hitbox.y = self.y
 
     # There is one in {argument} chances method returns true
     def oneInXChances(self, x):

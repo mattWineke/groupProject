@@ -9,7 +9,7 @@ from classes.PowerUp import PowerUp
 from classes.Database import Database
 
 from animations.animateInAndOut import *
-        
+
 # Named variables
 WINDOW_WIDTH = 400
 WINDOW_HEIGHT = 800
@@ -18,9 +18,9 @@ FRAME_RATE = 45
 # Color RGB codes
 LIGHT_GREEN = (100, 255, 100)
 WHITE = (255, 255, 255)
-        
+
 # Initialize Pygame
-pygame.init() 
+pygame.init()
 surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Pluto's Pursuit")
 clock = pygame.time.Clock()
@@ -30,17 +30,41 @@ font_size = 25
 font_margin = 20
 game_font = pygame.font.SysFont('calibri, helvetica, arial', font_size, bold = True)
 
-# Load background image
-bg = pygame.image.load(f"images/background/space.png")
+# Load images
+load = pygame.image.load
+characterPath = "images/character"
+platformPath = "images/platforms"
+enemyPath = "images/enemy"
+powerupPath = "images/powerups"
 
-# Load satellite image
-satellite_sprite = pygame.image.load("images/character/plutos_satalite.PNG")
+background_image = load(f"images/background/space.png")
+satellite_image = load(f"{characterPath}/plutos_satalite.png")
+playerImages = {
+    "right": [load(f"{characterPath}/R1Pluto.png"), load(f"{characterPath}/R2Pluto.png"), load(f"{characterPath}/R3Pluto.png"), load(f"{characterPath}/R4Pluto.png")],
+    "left": [load(f"{characterPath}/L1Pluto.png"), load(f"{characterPath}/L2Pluto.png"), load(f"{characterPath}/L3Pluto.png"), load(f"{characterPath}/L4Pluto.png")],
+    "idle": [load(f"{characterPath}/I1Pluto.png"), load(f"{characterPath}/I2Pluto.png"), load(f"{characterPath}/I3Pluto.png"), load(f"{characterPath}/I4Pluto.png")],
+}
+platformImages = {
+    'normal': load(f"{platformPath}/platform1.png"),
+    'moving': load(f"{platformPath}/platform1.png"),
+    'breakable': load(f"{platformPath}/platform1.png"),
+}
+enemyImages = {
+    'left': load(f"{enemyPath}/SpacemiteL.png"),
+    'right': load(f"{enemyPath}/SpacemiteR.png"),
+}
+powerupImages = {
+    'invincibility': load(f"{powerupPath}/powerup1.png"),
+    'double_points': load(f"{powerupPath}/powerup2.png"),
+    'score_boost': load(f"{powerupPath}/powerup3.png"),
+}
 
 # Database instance
 db = Database()
 
 # Player instance
-pluto = Player()
+pluto = Player(playerImages)
+PLUTO_PERSONAL_SPACE = 15 # Distance between the satellite/power-up cues and pluto's image
 
 # Set window icon to one of pluto's images
 pygame.display.set_icon(pluto.sprites_right[0])
@@ -87,7 +111,7 @@ def main():
         handlePowerups()
 
         # Update Player instance every frame
-        pluto.tick(surfaces = PLATFORMS)
+        pluto.tick(PLATFORMS)
 
         # Check if the player has fallen off the screen
         if playerFell(): running = False
@@ -120,13 +144,11 @@ def main():
 
 
         # Draw background
-        surface.blit(bg, (0, 0))
+        surface.blit(background_image, (0, 0))
         
         # Draw pluto's satellite
-        SATELLITE_DISTANCE = 15
-        SATELLITE_POSITION = (pluto.x - SATELLITE_DISTANCE, pluto.y - SATELLITE_DISTANCE + pluto.camera_y_offset)
-            
-        surface.blit(satellite_sprite, SATELLITE_POSITION)
+        SATELLITE_POSITION = (pluto.x - PLUTO_PERSONAL_SPACE, pluto.y - PLUTO_PERSONAL_SPACE + pluto.camera_y_offset)
+        surface.blit(satellite_image, SATELLITE_POSITION)
             
         # Draw pluto
         surface.blit(pluto.current_sprites[int(pluto.current_frame)], pluto.sprite_rect)
@@ -141,13 +163,13 @@ def main():
         if DYNAMIC["score_boost"]["active"]:
             # Draw "+5" next to Pluto
             animateTextInAndOut(surface, game_font, text = "+5", initial_size = 0, max_size = 30, color = "green",
-                             center = (pluto.x + pluto.width, pluto.y + pluto.camera_y_offset), total_duration = 0.8,
+                             center = (pluto.x + pluto.width + PLUTO_PERSONAL_SPACE, pluto.y + pluto.camera_y_offset), total_duration = 0.8,
                              time_left = DYNAMIC["score_boost"]["timer"] / FRAME_RATE, animation_duration = 0.2)
             
         elif DYNAMIC["double_points"]["active"]:
             # Draw "2x" next to Pluto
             animateTextInAndOut(surface, game_font, text = "2x", initial_size = 0, max_size = 30, color = "dodgerblue2",
-                             center = (pluto.x + pluto.width, pluto.y + pluto.camera_y_offset), total_duration = 5,
+                             center = (pluto.x + pluto.width + PLUTO_PERSONAL_SPACE, pluto.y + pluto.camera_y_offset), total_duration = 5,
                              time_left = DYNAMIC["double_points"]["timer"] / FRAME_RATE, animation_duration = 0.3)
             
 
@@ -236,7 +258,7 @@ def createObjects():
     if not PLATFORMS or last_platform_y_position > CAMERA_UPPER_BOUND:
         new_platform_y_position = last_platform_y_position - PLATFORM_GAP
         new_platform_x_position = random.randint(PADDING, WINDOW_WIDTH - PLATFORM_WIDTH - PADDING)
-        platform_instance = Platform(new_platform_x_position, new_platform_y_position, currentScore = DYNAMIC["score"])
+        platform_instance = Platform(platformImages, new_platform_x_position, new_platform_y_position, currentScore = DYNAMIC["score"])
 
         PLATFORMS.append(platform_instance)
 
@@ -244,7 +266,7 @@ def createObjects():
         if platform_instance.hasEnemy:
             possible_x_values = [platform_instance.x, platform_instance.x + platform_instance.width]
             y_position = platform_instance.y
-            enemy_instance = Enemy(possible_x_values, y_position)
+            enemy_instance = Enemy(enemyImages, possible_x_values, y_position)
             
             ENEMIES.append(enemy_instance)
 
@@ -252,7 +274,7 @@ def createObjects():
         elif platform_instance.hasPowerUp:
             possible_x_values = [platform_instance.x, platform_instance.x + platform_instance.width]
             y_position = platform_instance.y
-            powerup_instance = PowerUp(possible_x_values, y_position)
+            powerup_instance = PowerUp(powerupImages, possible_x_values, y_position)
             
             POWERUPS.append(powerup_instance)
 

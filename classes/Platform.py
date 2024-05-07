@@ -3,42 +3,45 @@ import random
 
 class Platform:
     # Constructor for Platform class
-    def __init__(self, x, y, currentScore = 0):           
+    def __init__(self, sprites, x, y, currentScore = 0):           
+        # Set platform type
+        self.type = self.determinePlatformType()
+        
         # Load sprites
-        platformPath = "images/platforms"
-        self.platform_sprite = pygame.image.load(f"{platformPath}/platform1.png")
+        self.platform_sprite = sprites[self.type]
+
+        # Initialize sprite rectangle
+        self.sprite_rect = self.platform_sprite.get_rect(y = -500) # -500 to make sure the platform appears out of the screen
 
         # Platform's dimensions
-        self.width = self.platform_sprite.get_rect().width  # Get the width from the sprite
-        self.height = self.platform_sprite.get_rect().height  # Get the height from the sprite
+        self.width = self.sprite_rect.width
+        self.height = self.sprite_rect.height
         
         # Platform's initial coordinates
         self.x = x
         self.y = y
 
-        # Initialize sprite rectangle
-        self.sprite_rect = self.platform_sprite.get_rect(center=(self.x, self.y))
-
-        # Set platform type
-        self.type = self.determinePlatformType()
-
         # Platform's state
         self.touched = False
         self.hasChangedScore = False
-
         self.hasEnemy = False
         self.hasPowerUp = False
 
         # Place an enemy: Chances increase as score does - At 200 there is an enemy on (almost) every platform
-        if self.oneInXChances(max(5 - currentScore / 50, 1.1)):
+        if self.oneInXChances(max(4 - currentScore / 50, 1.1)):
             self.hasEnemy = True
 
         # Place a power-up: Chances increase as score does - Enemies still have priority over power-ups    
         elif self.oneInXChances(max(5 - currentScore / 50, 1.5)):
             self.hasPowerUp = True
 
+        # Initialize platform's hitbox
+        self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
+
     # Method that gets called every frame
     def tick(self):
+        self.updateHitbox()
+        
         if self.type == "moving":
             self.movePlatform()
 
@@ -65,6 +68,10 @@ class Platform:
     def oneInXChances(self, x):
         return random.randint(1, 100) <= 100 / x
 
+    # Method to update platform's hitbox
+    def updateHitbox(self):
+        self.hitbox.x = self.x
+        self.hitbox.y = self.y
 
     # Method that gets called every frame if it's a moving platform
     def movePlatform(self):

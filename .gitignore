@@ -1,0 +1,5 @@
+# Ignore any pycache folders that are created when running the game
+__pycache__/
+
+# Ignore database folder that stores personal data (high score)
+database/
