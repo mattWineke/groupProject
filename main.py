@@ -38,16 +38,14 @@ enemyPath = "images/enemy"
 powerupPath = "images/powerups"
 
 background_image = load(f"images/background/space.png")
+cloud_image = load(f"images/background/clouds.png")
 satellite_image = load(f"{characterPath}/plutos_satalite.png")
 playerImages = {
     "right": [load(f"{characterPath}/R1Pluto.png"), load(f"{characterPath}/R2Pluto.png"), load(f"{characterPath}/R3Pluto.png"), load(f"{characterPath}/R4Pluto.png")],
     "left": [load(f"{characterPath}/L1Pluto.png"), load(f"{characterPath}/L2Pluto.png"), load(f"{characterPath}/L3Pluto.png"), load(f"{characterPath}/L4Pluto.png")],
     "idle": [load(f"{characterPath}/I1Pluto.png"), load(f"{characterPath}/I2Pluto.png"), load(f"{characterPath}/I3Pluto.png"), load(f"{characterPath}/I4Pluto.png")],
 }
-platformImages = {
-    'normal': load(f"{platformPath}/platform1.png"),
-    'moving': load(f"{platformPath}/platform1.png"),
-}
+platformImage = load(f"{platformPath}/platform1.png")
 enemyImages = {
     'left': load(f"{enemyPath}/SpacemiteL.png"),
     'right': load(f"{enemyPath}/SpacemiteR.png"),
@@ -145,6 +143,10 @@ def main():
 
         # Draw background
         surface.blit(background_image, (0, 0))
+
+        # Draw clouds
+        CLOUDS_POSITION = (0, WINDOW_HEIGHT - cloud_image.get_rect().height + pluto.camera_y_offset)
+        surface.blit(cloud_image, CLOUDS_POSITION)
         
         # Draw pluto's satellite
         SATELLITE_POSITION = (pluto.x - PLUTO_PERSONAL_SPACE, pluto.y - PLUTO_PERSONAL_SPACE + pluto.camera_y_offset)
@@ -257,7 +259,7 @@ def createObjects():
     if not PLATFORMS or last_platform_y_position > CAMERA_UPPER_BOUND:
         new_platform_y_position = last_platform_y_position - PLATFORM_GAP
         possible_x_values = [PADDING, WINDOW_WIDTH - PADDING]
-        platform_instance = Platform(platformImages, possible_x_values, new_platform_y_position, currentScore = DYNAMIC["score"])
+        platform_instance = Platform(platformImage, possible_x_values, new_platform_y_position, currentScore = DYNAMIC["score"])
 
         PLATFORMS.append(platform_instance)
 

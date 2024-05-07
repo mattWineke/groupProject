@@ -6,9 +6,6 @@ Write your name next to a task or idea if you want to implement it - that way we
 TO-DOS:
     - Start Game Screen (Simran)
     - End Game Screen (Santiago)
-    - Images:
-        - Moving platforms (Hayden)
-        - Surface that pluto stands on at the beginning (Hayden)
 
 IDEAS:
     - Music and sound effects (Matthew)

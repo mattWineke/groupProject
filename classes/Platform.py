@@ -3,12 +3,12 @@ import random
 
 class Platform:
     # Constructor for Platform class
-    def __init__(self, sprites, possibleXValues, y, currentScore = 0):           
+    def __init__(self, sprite, possibleXValues, y, currentScore = 0):           
         # Set platform type
         self.type = self.determinePlatformType()
         
         # Load sprites
-        self.platform_sprite = sprites[self.type]
+        self.platform_sprite = sprite
 
         # Initialize sprite rectangle
         self.sprite_rect = self.platform_sprite.get_rect(y = -500) # -500 to make sure the platform appears out of the screen
