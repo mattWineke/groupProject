@@ -4,20 +4,15 @@ Please feel free to add or delete anything - any idea (big or small) is accepted
 Write your name next to a task or idea if you want to implement it - that way we won't have multiple people overriding their work.
 
 TO-DOS:
-    - Start Game Screen
-    - End Game Screen
-    - Moving platforms
-    - Breakable platforms
+    - Start Game Screen (Simran)
+    - End Game Screen (Santiago)
+    - Moving platforms (Santiago)
+    - Breakable platforms (Santiago)
     - Images:
-        - Moving platforms
-        - Breakable platforms
-        - Surface that pluto stands on at the beginning (e.g. moon)
-
-    - Organize presentation (introduction, main points, class interaction, etc.)
+        - Moving platforms (Hayden)
+        - Breakable platforms (Hayden)
+        - Surface that pluto stands on at the beginning (Hayden)
 
 IDEAS:
-    - Extra-life power-up
-    - Music and sound effects
-    - Use a prettier font
-    - Image for non-moving enemy
-    - When invincible, enemies fly away in a different direction depending on how they're hit
+    - Music and sound effects (Matthew)
+    - Image for non-moving enemy (Hayden)
