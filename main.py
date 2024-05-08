@@ -74,7 +74,7 @@ pygame.display.set_icon(pluto.sprites_right[0])
 # Dictionary to store dynamic variables
 DYNAMIC = {
     "score": 0,
-    "high_score": db.get_high_score(),
+    "high_score": db.getHighScore(),
     "invincibility": {
         "active": False,
         "timer": 0
@@ -97,6 +97,7 @@ POWERUPS = []
 # Flag to control game state
 running = True
 
+# Function with game's main logic
 def main():
     global running
     running = True
@@ -315,6 +316,9 @@ def playerFell():
 def displayEndScreen():
     global running
     
+    # Change high score if necessary
+    DYNAMIC["high_score"] = max(DYNAMIC["score"], DYNAMIC["high_score"])
+    
     # Named variables
     BUTTON_WIDTH = 200
     BUTTON_HEIGHT = 50
@@ -332,14 +336,14 @@ def displayEndScreen():
             text="Play Again", function=startGame,
             x=WINDOW_WIDTH // 4, y=CONTENT_Y_POSITION,
             width=BUTTON_WIDTH, height=BUTTON_HEIGHT,
-            font=game_font, color=WHITE,
+            font=game_font, color=WHITE, borderRadius=7,
             backgroundColor=LIGHT_BLUE, hoverColor=BLUE)
 
     exit_button = Button(
         text="Exit Game", function=exitGame,
         x=WINDOW_WIDTH // 4, y=CONTENT_Y_POSITION + GAP,
         width=BUTTON_WIDTH, height=BUTTON_HEIGHT,
-        font=game_font, color=WHITE,
+        font=game_font, color=WHITE, borderRadius=7,
         backgroundColor=LIGHT_BLUE, hoverColor=BLUE)
     
     while not running:
@@ -360,7 +364,7 @@ def displayEndScreen():
 
         # Key controls
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_q] or keys[pygame.K_e]: exitGame()
+        if keys[pygame.K_q] or keys[pygame.K_e] or keys[pygame.K_ESCAPE]: exitGame()
         elif keys[pygame.K_a] or keys[pygame.K_p] or keys[pygame.K_DOWN] or keys[pygame.K_s]: startGame()
 
         # Update the display
@@ -374,7 +378,6 @@ def startGame():
     pluto = Player(playerImages)
     
     # Reset dynamic variables
-    DYNAMIC["high_score"] = max(DYNAMIC["score"], DYNAMIC["high_score"])
     DYNAMIC["score"] = 0
     DYNAMIC["invincibility"]["timer"] = 0
     DYNAMIC["double_points"]["timer"] = 0
@@ -390,7 +393,7 @@ def startGame():
 
 # Function to exit the program
 def exitGame():
-    db.set_high_score(DYNAMIC["high_score"])
+    db.setHighScore(max(DYNAMIC["score"], DYNAMIC["high_score"]))
     
     pygame.quit()
     sys.exit()

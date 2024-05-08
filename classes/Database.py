@@ -3,7 +3,7 @@ import os
 
 class Database:
     # Constructor for Database class
-    def __init__(self, path="database/data.json"): # Default path - can be changed when initializing
+    def __init__(self, path="database/data.json"):
         self.path = path
         self.data = {}
         self._load()
@@ -28,10 +28,10 @@ class Database:
             print(f"Error saving data to {self.path}: {error}")
 
     # Public method to get the high score from the database
-    def get_high_score(self):
+    def getHighScore(self):
         return self.data.get("high_score", 0) # If high_score doesn't exist, default to 0
 
     # Public method to set the high score in the database
-    def set_high_score(self, score):
+    def setHighScore(self, score):
         self.data["high_score"] = score
         self._save()
