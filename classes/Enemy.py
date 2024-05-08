@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 
 class Enemy:
     # Constructor for Enemy class
@@ -10,6 +11,10 @@ class Enemy:
         self.moving_enemy = self.oneInXChances(3) # ~33% chance
         self.speed = random.random() * 2
         self.direction = random.choice([-1, 1])  # 1 for right, -1 for left
+
+        # Fly-away controls
+        self.x_flying_speed = 0
+        self.y_flying_speed = 0
         
         # Load sprites
         self.sprite_left = sprites["left"]
@@ -34,10 +39,10 @@ class Enemy:
         self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
 
     # Method that gets called every frame
-    def tick(self):
+    def tick(self, windowWidth, windowHeight):
         self.updateHitbox()
         
-        if not self.is_alive: self.die()
+        if not self.is_alive: self.flyAway(windowWidth, windowHeight)
         elif self.moving_enemy: self.move()
 
     # Move the enemy considering platform surface
@@ -66,16 +71,31 @@ class Enemy:
     def oneInXChances(self, x):
         return random.randint(1, 100) <= 100 / x
     
-    # Method that makes enemy fly away
-    def die(self):
+    # Method to call when the enemy is hit with the invincibility power-up active
+    def die(self, playerFeetCoordinates):
         if self.is_alive:
-            self.is_alive = False
-            self.current_sprite = pygame.transform.rotate(self.sprite_left, 35)
+            # Get the player's feet position
+            player_x, player_y = playerFeetCoordinates
 
-        # Check if the enemy is out of the screen
-        if self.x + self.width > 0:
-            self.x -= 15
-            self.y -= 60
+            # Calculate the angle from where the enemy was hit
+            dx = self.x + self.width / 2 - player_x # Horizontal distance between the player and the enemy
+            dy = self.y + self.height / 2 - player_y # Vertical distance between the player and the enemy
+            angle = math.atan2(dy, dx) # Get the angle in radians
+
+            # Calculate fly-away speeds based on the angle
+            self.y_flying_speed = math.sin(angle) * 65
+            self.x_flying_speed = math.cos(angle) * (25 if abs(self.y_flying_speed) > 20 else 60)
+
+            # Update enemy's state
+            self.is_alive = False
+
+    # Method that makes the enemy fly away
+    def flyAway(self, windowWidth, windowHeight):
+        # Check if the enemy is still on the screen
+        if 0 <= self.x <= windowWidth and 0 <= self.sprite_rect.y <= windowHeight:
+            # Update position
+            self.x += self.x_flying_speed
+            self.y += self.y_flying_speed
 
         else:
             # Move the enemy below the screen so it's deleted by removeOffScreenObjects function

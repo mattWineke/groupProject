@@ -148,8 +148,8 @@ def main():
         # Draw background
         surface.blit(background_image, (0, 0))
 
-        # Draw clouds if player's score is less than 15
-        if (DYNAMIC["score"] < 15):
+        # Draw clouds if needed
+        if (pluto.camera_y_offset < WINDOW_HEIGHT):
             CLOUDS_POSITION = (0, WINDOW_HEIGHT - (cloud_image.get_rect().height - 50) + pluto.camera_y_offset)
             surface.blit(cloud_image, CLOUDS_POSITION)
         
@@ -180,11 +180,15 @@ def main():
             enemy.sprite_rect.update(enemy.x, enemy.y + pluto.camera_y_offset, enemy.width, enemy.height)
 
             # Update Enemy instance every frame
-            enemy.tick()
+            enemy.tick(WINDOW_WIDTH, WINDOW_HEIGHT)
 
             # Handle enemy collision with pluto
-            if enemy.collidedWith(pluto): 
-                enemy.die() if DYNAMIC["invincibility"]["active"] else pluto.die()
+            if enemy.collidedWith(pluto):
+                if DYNAMIC["invincibility"]["active"]:
+                    enemy.die(playerFeetCoordinates = (pluto.x + pluto.width / 2, pluto.y + pluto.height - 10))
+
+                else:
+                    pluto.die()
 
         # Draw power-ups
         for powerup in POWERUPS:
@@ -365,7 +369,7 @@ def displayEndScreen():
         # Key controls
         keys = pygame.key.get_pressed()
         if keys[pygame.K_q] or keys[pygame.K_e] or keys[pygame.K_ESCAPE]: exitGame()
-        elif keys[pygame.K_a] or keys[pygame.K_p] or keys[pygame.K_DOWN] or keys[pygame.K_s]: startGame()
+        elif keys[pygame.K_p] or keys[pygame.K_s] or keys[pygame.K_DOWN]: startGame()
 
         # Update the display
         pygame.display.flip()
