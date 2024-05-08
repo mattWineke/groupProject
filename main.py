@@ -144,7 +144,8 @@ def main():
 
 
         # Draw background
-        surface.blit(background_image, (0, 0))
+        background_y_position = -(background_image.get_rect().height - WINDOW_HEIGHT) * (1 - max(0, min(1, (pluto.camera_y_offset / (20 * WINDOW_HEIGHT)))))
+        surface.blit(background_image, (0, background_y_position))
 
         # Draw clouds if needed
         if (pluto.camera_y_offset < WINDOW_HEIGHT):
@@ -237,7 +238,6 @@ def main():
         high_score_coordinates = (WINDOW_WIDTH - high_score_text_width - font_margin, font_margin)
         surface.blit(high_score_surface, high_score_coordinates)
         
-
 
         # Update the display
         pygame.display.flip()
