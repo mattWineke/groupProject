@@ -45,7 +45,7 @@ class Button:
         surface.blit(text_surface, text_rect)
         
         # Change cursor based on hover state
-        if self.hovered and not (mouseIsHovering):
+        if self.hovered and not mouseIsHovering:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
             self.hovered = False
         elif not self.hovered and mouseIsHovering:

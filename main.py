@@ -85,6 +85,8 @@ DYNAMIC = {
         "active": False,
         "timer": 0
     },
+    "background_y_position": 1,
+    "target_background_y_position": None
 }
 
 # Lists with game objects
@@ -144,8 +146,8 @@ def main():
 
 
         # Draw background
-        background_y_position = -(background_image.get_rect().height - WINDOW_HEIGHT) * (1 - max(0, min(1, (pluto.camera_y_offset / (20 * WINDOW_HEIGHT)))))
-        surface.blit(background_image, (0, background_y_position))
+        updateBackgroundYPosition()
+        surface.blit(background_image, (0, DYNAMIC["background_y_position"]))
 
         # Draw clouds if needed
         if (pluto.camera_y_offset < WINDOW_HEIGHT):
@@ -314,9 +316,53 @@ def playerFell():
         return False
 
 
+def updateBackgroundYPosition():
+    # Calculate the maximum offset the background can move vertically
+    max_offset = -(background_image.get_rect().height - WINDOW_HEIGHT)
+
+    # Target background position
+    target = max_offset if DYNAMIC["target_background_y_position"] == "start" else 0
+
+    # Current background position
+    position = DYNAMIC["background_y_position"]
+    if position > 0: position = max_offset
+
+    # Check if the target position has already been achieved
+    target_accomplished = (DYNAMIC["target_background_y_position"] == None) or (target == position)
+
+    # If the target has not been achieved...
+    if not target_accomplished:
+        # Calculate moving speed relative to frame rate for smooth transition
+        MOVING_SPEED = (target + position) / FRAME_RATE
+
+        # Determine the direction of movement -1 for up, 2 for down
+        DIRECTION = -1 if target > position else 2
+
+        # Update the position towards the target
+        position += MOVING_SPEED * DIRECTION
+
+        # Ensure the background y-position does not go out of bound and update it
+        DYNAMIC["background_y_position"] = max(max_offset, min(0, position))
+        
+    # If the target has been achieved... (middle-game)
+    else:
+        # Reset the target marker
+        DYNAMIC["target_background_y_position"] = None
+
+        # Normalize the camera offset to a scale that makes the background movement smoother
+        normalized_camera_offset = pluto.camera_y_offset / (40 * WINDOW_HEIGHT) # 40 is an arbitrary number, the background stops moving at a score of ~200
+
+        # Ensure the normalized value stays within the range 0 to 1
+        clamped_value = max(0, min(1, normalized_camera_offset))
+
+        # Assign the background's y-position by scaling the max offset relative to the clamped value
+        DYNAMIC["background_y_position"] = max_offset * (1 - clamped_value)
+
+
 # Function to display the end screen
 def displayEndScreen():
     global running
+    DYNAMIC["target_background_y_position"] = "end"
     
     # Change high score if necessary
     DYNAMIC["high_score"] = max(DYNAMIC["score"], DYNAMIC["high_score"])
@@ -351,7 +397,8 @@ def displayEndScreen():
                 exitGame()
 
         # Draw background
-        surface.blit(background_image, (0, 0))
+        updateBackgroundYPosition()
+        surface.blit(background_image, (0, DYNAMIC["background_y_position"]))
 
         # Draw the score
         surface.blit(score_surface, score_rect)
@@ -375,6 +422,7 @@ def startGame():
     DYNAMIC["invincibility"]["timer"] = 0
     DYNAMIC["double_points"]["timer"] = 0
     DYNAMIC["score_boost"]["timer"] = 0
+    DYNAMIC["target_background_y_position"] = "start"
 
     # Reset objects
     PLATFORMS.clear()
