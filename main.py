@@ -17,8 +17,6 @@ FRAME_RATE = 45
 
 # Color RGB codes
 LIGHT_GREEN = (100, 255, 100)
-BLUE = (30, 30, 255)
-LIGHT_BLUE = (70, 70, 255)
 WHITE = (255, 255, 255)
 
 # Initialize Pygame
@@ -324,8 +322,6 @@ def displayEndScreen():
     DYNAMIC["high_score"] = max(DYNAMIC["score"], DYNAMIC["high_score"])
     
     # Named variables
-    BUTTON_WIDTH = 200
-    BUTTON_HEIGHT = 50
     GAP = 70
     CONTENT_Y_POSITION = WINDOW_HEIGHT // 2 - 25
 
@@ -337,18 +333,16 @@ def displayEndScreen():
 
     # Button Instances
     play_again_button = Button(
-            text="Play Again", function=startGame,
+            text="Play Again", callback=startGame,
             x=WINDOW_WIDTH // 4, y=CONTENT_Y_POSITION,
-            width=BUTTON_WIDTH, height=BUTTON_HEIGHT,
-            font=game_font, color=WHITE, borderRadius=7,
-            backgroundColor=LIGHT_BLUE, hoverColor=BLUE)
+            shortcutKeys=[pygame.K_p, pygame.K_s, pygame.K_DOWN]
+        )
 
     exit_button = Button(
-        text="Exit Game", function=exitGame,
-        x=WINDOW_WIDTH // 4, y=CONTENT_Y_POSITION + GAP,
-        width=BUTTON_WIDTH, height=BUTTON_HEIGHT,
-        font=game_font, color=WHITE, borderRadius=7,
-        backgroundColor=LIGHT_BLUE, hoverColor=BLUE)
+            text="Exit Game", callback=exitGame,
+            x=WINDOW_WIDTH // 4, y=CONTENT_Y_POSITION + GAP,
+            shortcutKeys=[pygame.K_q, pygame.K_e, pygame.K_ESCAPE]
+        )
     
     while not running:
         # Event loop
@@ -365,11 +359,6 @@ def displayEndScreen():
         # Draw buttons
         play_again_button.draw(surface)
         exit_button.draw(surface)
-
-        # Key controls
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_q] or keys[pygame.K_e] or keys[pygame.K_ESCAPE]: exitGame()
-        elif keys[pygame.K_p] or keys[pygame.K_s] or keys[pygame.K_DOWN]: startGame()
 
         # Update the display
         pygame.display.flip()

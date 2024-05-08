@@ -62,13 +62,13 @@ class Player:
         self.animateCameraMovement()
 
         if self.is_jumping:
-            self.jump(override_surface_condition=True)
+            self.jump(overrideSurfaceCondition=True)
         else:
             self.fall(platforms)
 
     # Method to manage player's x position
-    def move(self, pixels_to_move):
-        self.x += pixels_to_move
+    def move(self, pixels):
+        self.x += pixels
 
         # Amount of pixels the player has to move off-screen to appear on the other side
         LOOPING_OFFSET = 5
@@ -81,8 +81,8 @@ class Player:
             self.x = SCREEN_LEFT
 
     # Method to handle jump animation
-    def jump(self, override_surface_condition = False):
-        if self.is_on_surface or override_surface_condition:
+    def jump(self, overrideSurfaceCondition = False):
+        if self.is_on_surface or overrideSurfaceCondition:
             self.is_on_surface = False
             self.is_jumping = True
             
@@ -187,7 +187,7 @@ class Player:
 
             # Player does a tiny jump before falling
             self.current_jumping_strength = 15
-            self.jump(override_surface_condition = True)
+            self.jump(overrideSurfaceCondition = True)
 
             # Reset falling speed
             self.current_falling_speed = 1
