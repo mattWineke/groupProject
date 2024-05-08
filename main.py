@@ -167,7 +167,7 @@ def main():
             platform.sprite_rect.update(platform.x, platform.y + pluto.camera_y_offset, platform.width, platform.height)
 
             # Update Platform instance every frame
-            platform.tick()
+            platform.tick(pluto)
 
             # Increase score if the platform is touched for the first time
             if platform.touched and not platform.hasChangedScore:

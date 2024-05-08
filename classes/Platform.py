@@ -45,11 +45,11 @@ class Platform:
         self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
 
     # Method that gets called every frame
-    def tick(self):
+    def tick(self, player):
         self.updateHitbox()
         
         if self.type == "moving":
-            self.movePlatform()
+            self.movePlatform(player)
 
     # Method to determine platform's type
     def determinePlatformType(self):
@@ -73,8 +73,13 @@ class Platform:
         self.hitbox.y = self.y
 
     # Method that gets called every frame if it's a moving platform
-    def movePlatform(self):
+    def movePlatform(self, player):
         self.x += self.speed * self.direction
+
+        # Check if the player is standing on the platform
+        if self.hitbox.colliderect(player.hitbox):
+            # Move the player along with the platform
+            player.x += self.speed * self.direction
 
         # If platform has reached screen edge
         if self.x < self.min_x_value or self.x > self.max_x_value:
