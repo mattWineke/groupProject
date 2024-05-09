@@ -371,7 +371,7 @@ def displayEndScreen():
     GAP = 70
     CONTENT_Y_POSITION = WINDOW_HEIGHT // 2 - 25
 
-    # Initiate score text
+    # Initialize score text
     score_text = f"Final Score: {DYNAMIC['score']}"
     score_font = pygame.font.SysFont(FONT_FAMILY, 37, bold = True)
     score_surface = score_font.render(score_text, True, WHITE)
