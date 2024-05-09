@@ -101,7 +101,7 @@ running = True
 # Play music
 s='sounds'
 music=pygame.mixer.music.load(os.path.join(s,'music.mp3'))
-pygame.mixer.music.play(-1)           
+pygame.mixer.music.play(-1)
 
 # Function with game's main logic
 def main():

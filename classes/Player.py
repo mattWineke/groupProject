@@ -87,7 +87,12 @@ class Player:
 
     # Method to handle jump animation
     def jump(self, overrideSurfaceCondition = False):
+        if self.is_on_surface:
+            # Play jumping sound
+            jump_sound.play()
+
         if self.is_on_surface or overrideSurfaceCondition:
+            # Update player's state
             self.is_on_surface = False
             self.is_jumping = True
             
@@ -103,9 +108,6 @@ class Player:
 
                 # Reset jumping strength for next jump
                 self.current_jumping_strength = JUMPING_STRENGTH
-
-        if self.is_on_surface:
-            jump_sound.play()  
 
     # Method to check if the player is standing on a platform
     def isOnPlatform(self, platforms):
@@ -192,6 +194,8 @@ class Player:
     def die(self):
         if self.is_alive:
             self.is_alive = False
+
+            # Play dying sound
             ouch.play()
 
             # Player does a tiny jump before falling
