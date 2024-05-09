@@ -13,7 +13,7 @@ JUMPING_STRENGTH = 50
 
 CAMERA_FOLLOW_OFFSET = SCREEN_BOTTOM - 300  # Position where the camera will place pluto when moving
 
-# Load jumping sound
+# Load sounds
 pygame.mixer.init()
 jump_sound = pygame.mixer.Sound('sounds/jumpSound.wav')
 ouch = pygame.mixer.Sound('sounds/playerDamage.aiff')
