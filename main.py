@@ -1,5 +1,6 @@
 import pygame
 import sys
+import os
 
 from classes.Player import Player
 from classes.Platform import Platform
@@ -96,6 +97,11 @@ POWERUPS = []
 
 # Flag to control game state
 running = True
+
+# Play music
+s='sounds'
+music=pygame.mixer.music.load(os.path.join(s,'music.mp3'))
+pygame.mixer.music.play(-1)           
 
 # Function with game's main logic
 def main():

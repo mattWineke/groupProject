@@ -13,6 +13,11 @@ JUMPING_STRENGTH = 50
 
 CAMERA_FOLLOW_OFFSET = SCREEN_BOTTOM - 300  # Position where the camera will place pluto when moving
 
+# Load jumping sound
+pygame.mixer.init()
+jump_sound = pygame.mixer.Sound('sounds/jumpSound.wav')
+ouch = pygame.mixer.Sound('sounds/playerDamage.aiff')
+
 class Player:
     # Constructor for Player class
     def __init__(self, sprites):
@@ -99,6 +104,9 @@ class Player:
                 # Reset jumping strength for next jump
                 self.current_jumping_strength = JUMPING_STRENGTH
 
+        if self.is_on_surface:
+            jump_sound.play()  
+
     # Method to check if the player is standing on a platform
     def isOnPlatform(self, platforms):
         player_is_on_platform = False
@@ -184,6 +192,7 @@ class Player:
     def die(self):
         if self.is_alive:
             self.is_alive = False
+            ouch.play()
 
             # Player does a tiny jump before falling
             self.current_jumping_strength = 15
